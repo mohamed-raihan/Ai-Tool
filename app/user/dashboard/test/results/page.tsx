@@ -1,34 +1,618 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { toast } from "react-toastify";
+import {
+  FiDownload,
+  FiBarChart2,
+  FiAward,
+  FiBookOpen,
+  FiBook,
+} from "react-icons/fi";
+import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import PsychometricReportPDF from "@/app/user/components/PsychometricReportPDF";
+import { findMatchingCareers } from "@/app/utils/careerMapping";
+import {
+  PersonalityService,
+  PersonalityTraitResult,
+} from "@/app/services/personality.service";
 
-import React from 'react';
-import Link from 'next/link';
+interface TestResult {
+  testName: string;
+  completedAt: string;
+  scores: Array<{
+    category: string;
+    score: number;
+    percentile: number;
+    interpretation: string;
+  }>;
+  overallScore: number;
+  overallPercentile: number;
+  overallInterpretation: string;
+  personalityTraits?: PersonalityTraitResult;
+}
 
-export default function ResultsPage() {
-  return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-md p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">Test Completed!</h1>
-        <p className="text-gray-600 mb-8 text-center">
-          Thank you for completing the psychometric assessment. Your results are being processed.
-        </p>
-        
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <h2 className="text-lg font-medium mb-3">What happens next?</h2>
-          <p className="text-gray-600">
-            Your responses will be analyzed, and a comprehensive report will be generated.
-            You will receive your results via email within 24 hours.
+const ResultsPage = () => {
+  const [results, setResults] = useState<TestResult | null>(null);
+  const [showPDF, setShowPDF] = useState(false);
+
+  const matchingCareers = findMatchingCareers(results?.scores || []);
+  console.log(matchingCareers);
+
+  useEffect(() => {
+    try {
+      const storedResults = localStorage.getItem("testResults");
+      if (!storedResults) return;
+
+      const parsedResults = JSON.parse(storedResults);
+      if (!parsedResults || !parsedResults.scores) {
+        toast.error("Invalid test results format");
+        return;
+      }
+
+      // Get personality results
+      const personalityService = new PersonalityService();
+      const personalityResults = personalityService.calculatePersonalityTraits(
+        parsedResults.answers || []
+      );
+
+      setResults({
+        ...parsedResults,
+        personalityTraits: personalityResults,
+      });
+    } catch (error) {
+      console.error("Error loading test results:", error);
+      toast.error("Failed to load test results");
+    }
+  }, []);
+
+  console.log(results);
+
+  const formatUserData = (results: TestResult) => {
+    return {
+      personalInfo: {
+        fullName: "Test User", // You can replace this with actual user data
+        testDate: new Date(results.completedAt).toLocaleDateString(),
+        testId: Math.random().toString(36).substr(2, 9).toUpperCase(),
+      },
+      aptitudeResults: {
+        overallScore: `${results.overallScore}%`,
+        overallPercentile: results.overallPercentile,
+        personalityTraits: results.scores.map(
+          (score) =>
+            `${score.category}: ${score.score}% (${score.interpretation})`
+        ),
+      },
+      recommendedFields: results.scores
+        .filter((score) => score.score >= 70)
+        .map((score) => ({
+          field: score.category,
+          matchScore: score.score,
+          reason: score.interpretation,
+        })),
+      educationInterests: results.scores.map((score) => ({
+        course: score.category,
+        interest: `${score.score}%`,
+        notes: score.interpretation,
+      })),
+      familyBackground: {
+        notes: "Family background information not available",
+        educationalHistory: [],
+      },
+      achievements: results.scores
+        .filter((score) => score.score >= 80)
+        .map(
+          (score) => `Strong aptitude in ${score.category} (${score.score}%)`
+        ),
+      assessmentHistory: [
+        {
+          test: results.testName,
+          date: new Date(results.completedAt).toLocaleDateString(),
+          score: `${results.overallScore}%`,
+        },
+      ],
+      scores: results.scores,
+    };
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-emerald-600";
+    if (score >= 60) return "text-sky-600";
+    return "text-amber-600";
+  };
+
+  const getProgressBarColor = (score: number) => {
+    if (score >= 80) return "bg-emerald-500";
+    if (score >= 60) return "bg-sky-500";
+    return "bg-amber-500";
+  };
+
+  const getRecommendedFields = (
+    scores: Array<{ category: string; score: number }>
+  ) => {
+    const recommendations = [
+      {
+        categories: ["Analytical", "Logical"],
+        field: "Computer Science",
+        description: "Strong analytical thinking and problem-solving abilities",
+      },
+      {
+        categories: ["Creative", "Artistic"],
+        field: "Design",
+        description: "Excellence in creative and artistic expression",
+      },
+      {
+        categories: ["Social", "Communication"],
+        field: "Psychology",
+        description: "Strong interpersonal and communication skills",
+      },
+      // Add more field recommendations based on category combinations
+    ];
+
+    return recommendations.filter((rec) =>
+      rec.categories.some((cat) =>
+        scores.some(
+          (score) => score.category.includes(cat) && score.score >= 70
+        )
+      )
+    );
+  };
+
+  if (!results) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-100 mb-4">
+            No Results Found
+          </h2>
+          <p className="text-gray-400 mb-4">
+            Please complete the test to see your results.
           </p>
-        </div>
-        
-        <div className="flex justify-center">
-          <Link 
-            href="/user/dashboard"
-            className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 text-center"
+          <Link
+            href="/user/dashboard/test"
+            className="inline-block px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
           >
-            Return to Dashboard
+            Take Test
           </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const userData = formatUserData(results);
+  console.log(userData);
+  const recommendedFields = getRecommendedFields(results.scores);
+
+  return (
+    <div className="min-h-screen bg-gray-900 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* PDF Download Button */}
+        <div className="mb-6 flex justify-end">
+          <PDFDownloadLink
+            document={<PsychometricReportPDF userData={userData} />}
+            fileName="psychometric-report.pdf"
+            className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+          >
+            {({ loading }) => (
+              <>
+                <FiDownload className="mr-2" />
+                {loading ? "Generating PDF..." : "Download PDF"}
+              </>
+            )}
+          </PDFDownloadLink>
+        </div>
+
+        {/* PDF Preview */}
+        {showPDF && (
+          <div className="h-[600px] mb-6">
+            <PDFViewer className="w-full h-full">
+              <PsychometricReportPDF userData={userData} />
+            </PDFViewer>
+          </div>
+        )}
+
+        {/* Results Content */}
+        <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
+          <h1 className="text-3xl font-bold text-gray-100 mb-6">
+            Psychometric Assessment Report
+          </h1>
+
+          {/* Header Section */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-100">
+                Psychometric Assessment Report
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-sm text-gray-300">
+              <div>
+                <p>
+                  Date: {new Date(results.completedAt).toLocaleDateString()}
+                </p>
+                <p>
+                  Test ID:{" "}
+                  {Math.random().toString(36).substr(2, 9).toUpperCase()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p>
+                  Overall Score:{" "}
+                  <span className="font-bold">{results.overallScore}%</span>
+                </p>
+                <p>
+                  Percentile:{" "}
+                  <span className="font-bold">{results.overallPercentile}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Score Summary */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+              <FiBarChart2 className="mr-2 text-orange-500" /> Your Interest
+              Analysis
+            </h2>
+            <div className="space-y-6">
+              {[
+                { name: "Realistic", color: "coral" },
+                { name: "Investigative", color: "coral" },
+                { name: "Artistic", color: "coral" },
+                { name: "Social", color: "lime" },
+                { name: "Enterprising", color: "lime" },
+                { name: "Conventional", color: "coral" },
+              ].map((category, index) => {
+                const score =
+                  results.scores.find((s) => s.category === category.name)
+                    ?.score || 0;
+                return (
+                  <div key={index} className="relative">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-50 w-24">
+                        {category.name}
+                      </span>
+                      <span className="text-sm font-medium text-gray-200">
+                        {score}%
+                      </span>
+                    </div>
+                    <div className="relative">
+                      {/* Score ranges background */}
+                      <div className="h-3 w-full flex rounded-full overflow-hidden">
+                        <div className="w-1/3 bg-red-200 border-r border-white"></div>
+                        <div className="w-1/3 bg-yellow-200 border-r border-white"></div>
+                        <div className="w-1/3 bg-green-200"></div>
+                      </div>
+                      {/* Score bar */}
+                      <div
+                        className="absolute top-0 left-0 h-3 transition-all duration-500 rounded-full"
+                        style={{
+                          width: `${score}%`,
+                          backgroundColor:
+                            score <= 33
+                              ? "#EF4444"
+                              : score <= 66
+                              ? "#F59E0B"
+                              : "#10B981",
+                        }}
+                      ></div>
+                      {/* Score marker */}
+                      <div
+                        className="absolute top-0 -mt-1"
+                        style={{
+                          left: `${score}%`,
+                          transform: "translateX(-50%)",
+                        }}
+                      >
+                        <div className="w-1 h-4 bg-gray-800"></div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Score range labels */}
+              <div className="flex justify-between text-xs mt-4">
+                <div className="text-center">
+                  <div className="text-red-600 font-medium">Low</div>
+                  <div className="text-gray-500">(Score 1-3)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-yellow-600 font-medium">Moderate</div>
+                  <div className="text-gray-500">(Score 4-7)</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-green-600 font-medium">High</div>
+                  <div className="text-gray-500">(Score 8-10)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Personality Traits Section */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-100 mb-6 flex items-center">
+              <FiBookOpen className="mr-2 text-orange-500" /> Personality Traits
+            </h2>
+
+            <div className="space-y-6">
+              {results?.personalityTraits &&
+                Object.entries(results.personalityTraits.traits).map(
+                  ([dimension, trait]) => (
+                    <div
+                      key={dimension}
+                      className={`relative ${
+                        dimension === "JP"
+                          ? "bg-gray-800/50 p-4 rounded-lg"
+                          : ""
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-300">{trait.primary}</span>
+                        <span
+                          className={`text-${trait.color.replace(
+                            "#",
+                            ""
+                          )}-400 font-semibold`}
+                        >
+                          {trait.score}%
+                        </span>
+                        <span className="text-gray-400">{trait.secondary}</span>
+                      </div>
+                      <div className="relative h-2 bg-gray-700 rounded-full">
+                        <div
+                          className={`absolute left-0 h-full bg-${trait.color.replace(
+                            "#",
+                            ""
+                          )}-500 rounded-full`}
+                          style={{ width: `${trait.score}%` }}
+                        />
+                        <div
+                          className={`absolute w-4 h-4 bg-white border-2 border-${trait.color.replace(
+                            "#",
+                            ""
+                          )}-500 rounded-full -mt-1 transform -translate-x-1/2`}
+                          style={{ left: `${trait.score}%` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                )}
+            </div>
+
+            {/* Personality Description */}
+            {results?.personalityTraits && (
+              <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <div className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    <img
+                      src="/images/personality-icon.png"
+                      alt="Personality Type"
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                      {results.personalityTraits.type}
+                    </h3>
+                    <p className="text-gray-300">
+                      {results.personalityTraits.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Interest Description Section */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <div className="space-y-8">
+              {/* Primary Interest */}
+              {results.scores
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 2)
+                .map((trait, index) => {
+                  const traitDescriptions: {
+                    [key: string]: { title: string; description: string };
+                  } = {
+                    Realistic: {
+                      title: "The 'Doer'",
+                      description:
+                        "This means you enjoy working with your hands and solving practical problems.",
+                    },
+                    Investigative: {
+                      title: "The 'Thinker'",
+                      description:
+                        "This means you enjoy analyzing problems and discovering new solutions.",
+                    },
+                    Artistic: {
+                      title: "The 'Creator'",
+                      description:
+                        "This means you enjoy expressing yourself creatively and thinking outside the box.",
+                    },
+                    Social: {
+                      title: "The 'Helper'",
+                      description:
+                        "This means that you enjoy helping, teaching or guiding others.",
+                    },
+                    Enterprising: {
+                      title: "The 'Persuader'",
+                      description:
+                        "This means you like leading, encouraging and influencing others.",
+                    },
+                    Conventional: {
+                      title: "The 'Organizer'",
+                      description:
+                        "This means you enjoy working with data, numbers and detailed information.",
+                    },
+                  };
+
+                  const traitInfo = traitDescriptions[trait.category] || {
+                    title: "",
+                    description: "Description not available.",
+                  };
+
+                  return (
+                    <div key={index} className="flex items-start space-x-6">
+                      <div className="flex-shrink-0">
+                        <div
+                          className={`w-16 h-16 rounded-full border-4 ${
+                            index === 0
+                              ? "border-orange-400"
+                              : "border-orange-300"
+                          } flex items-center justify-center bg-gray-900`}
+                        >
+                          <span
+                            className={`text-2xl font-bold ${
+                              index === 0
+                                ? "text-orange-400"
+                                : "text-orange-300"
+                            }`}
+                          >
+                            {index + 1}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-xl text-gray-100 font-medium mb-2">
+                          {index === 0
+                            ? "Your Primary Interest"
+                            : "Your Secondary Interest"}{" "}
+                          -{" "}
+                          <span
+                            className={
+                              index === 0
+                                ? "text-orange-400"
+                                : "text-orange-300"
+                            }
+                          >
+                            {trait.category} - {traitInfo.title}
+                          </span>
+                        </h3>
+                        <p className="text-gray-400">{traitInfo.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
+          {/* Career Recommendations Table */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-orange-500 hover:shadow-[0_0_15px_rgba(249,115,22,0.4)] transition-all duration-300">
+            <h2 className="text-xl font-semibold mb-4 text-gray-100">
+              Career Recommendations
+            </h2>
+            {results?.scores ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-700">
+                  <thead className="bg-gray-900">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        Career Path
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        Description
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                        Required Education
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-gray-800 divide-y divide-gray-700">
+                    {findMatchingCareers(results.scores).map(
+                      (career, index) => (
+                        <tr key={index} className="hover:bg-gray-700">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-100">
+                              {career.career}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-400">
+                              {career.description}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <ul className="list-disc list-inside text-sm text-gray-400">
+                              {career.education.map((edu, eduIndex) => (
+                                <li key={eduIndex}>{edu}</li>
+                              ))}
+                            </ul>
+                          </td>
+                        </tr>
+                      )
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-4">
+                No career recommendations available. Please complete the test to
+                see your career matches.
+              </div>
+            )}
+          </div>
+
+          {/* Overall Interpretation */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
+              <FiBookOpen className="mr-2 text-orange-500" /> Summary
+            </h2>
+            <div className="space-y-4">
+              {results.scores
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 2)
+                .map((trait, index) => {
+                  const strengthWords =
+                    index === 0
+                      ? "strongest characteristic"
+                      : "second strongest characteristic";
+                  return (
+                    <p key={index} className="text-gray-300">
+                      Your {strengthWords} is in the {trait.category} domain,
+                      with a score of {trait.score}%. This indicates{" "}
+                      {trait.interpretation}.
+                    </p>
+                  );
+                })}
+
+              <p className="text-gray-300 mt-4">
+                Based on your interest profile, you would excel in careers that
+                combine{" "}
+                {results.scores
+                  .sort((a, b) => b.score - a.score)
+                  .slice(0, 2)
+                  .map((trait) => trait.category.toLowerCase())
+                  .join(" and ")}{" "}
+                qualities. The recommended career paths align with your natural
+                inclinations and strengths, suggesting roles where you can{" "}
+                {findMatchingCareers(results.scores)
+                  .slice(0, 1)
+                  .map((career) => career.description.toLowerCase())
+                  .join(", ")}
+                .
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-center space-x-4 mt-8">
+            <Link
+              href="/user/dashboard/test"
+              className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            >
+              Retake Test
+            </Link>
+            {/* <Link
+              href="/user/dashboard"
+              className="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
+            >
+              Return to Dashboard
+            </Link> */}
+          </div>
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default ResultsPage;
