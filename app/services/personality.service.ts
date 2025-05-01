@@ -30,7 +30,7 @@ interface QuestionMapping {
 
 // Map each question to its corresponding personality dimension
 const questionMappings: { [key: number]: QuestionMapping } = {
-  1: {
+  13: {
     dimension: "EI",
     EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
     SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
@@ -38,7 +38,78 @@ const questionMappings: { [key: number]: QuestionMapping } = {
     JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
     AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
   },
-  // Add more questions...
+  14: {
+    dimension: "SN",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  15: {
+    dimension: "TF",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  16: {
+    dimension: "JP",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  17: {
+    dimension: "AT",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  18: {
+    dimension: "EI",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  19: {
+    dimension: "SN",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  20: {
+    dimension: "TF",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  21: {
+    dimension: "JP",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
+  22: {
+    dimension: "AT",
+    EI: { primaryTrait: "Extraverted", secondaryTrait: "Introverted" },
+    SN: { primaryTrait: "Sensing", secondaryTrait: "Intuitive" },
+    TF: { primaryTrait: "Thinking", secondaryTrait: "Feeling" },
+    JP: { primaryTrait: "Judging", secondaryTrait: "Prospecting" },
+    AT: { primaryTrait: "Assertive", secondaryTrait: "Turbulent" },
+  },
 };
 
 // Define dimension colors for visualization
@@ -114,8 +185,9 @@ export class PersonalityService {
     dimension: keyof typeof dimensionColors,
     counter: { primary: number; total: number }
   ): PersonalityTrait {
-    const primaryPercentage = (counter.primary / counter.total) * 100;
-    const mapping = questionMappings[1];
+    const primaryPercentage =
+      counter.total > 0 ? (counter.primary / counter.total) * 100 : 50;
+    const mapping = questionMappings[13]; // Use the first question mapping as template
 
     return {
       primary: mapping[dimension].primaryTrait,
@@ -128,23 +200,84 @@ export class PersonalityService {
   private determinePersonalityType(traits: {
     [key: string]: PersonalityTrait;
   }): string {
+    // Get the first four letters (E/I, S/N, T/F, J/P)
     const type = [
       traits.EI.score >= 50 ? "E" : "I",
       traits.SN.score >= 50 ? "S" : "N",
       traits.TF.score >= 50 ? "T" : "F",
       traits.JP.score >= 50 ? "J" : "P",
-      traits.AT.score >= 50 ? "A" : "T",
     ].join("");
 
-    return type;
+    // Add the Assertive/Turbulent suffix
+    const suffix = traits.AT.score >= 50 ? "A" : "T";
+
+    return `${type}-${suffix}`;
   }
 
   private generatePersonalityDescription(type: string): string {
+    console.log("Generating personality description for type:", type);
     // Add personality type descriptions here
     const descriptions: { [key: string]: string } = {
       "ENFP-A":
-        "Youre likely very adaptable, easygoing and flexible, prioritizing spontaneity over stability. Your extroverted and intuitive nature makes you excellent at reading people and situations.",
-      // Add more descriptions for other types...
+        "You're likely very adaptable, easygoing and flexible, prioritizing spontaneity over stability. Your extroverted and intuitive nature makes you excellent at reading people and situations.",
+      "ENFP-T":
+        "You're creative, enthusiastic, and spontaneous, but may sometimes struggle with self-doubt. Your extroverted and intuitive nature makes you excellent at reading people and situations.",
+      "INFP-A":
+        "You're idealistic, creative, and empathetic, with a strong sense of personal values. Your introverted and intuitive nature makes you deeply reflective and insightful.",
+      "INFP-T":
+        "You're idealistic, creative, and empathetic, but may sometimes be overly sensitive to criticism. Your introverted and intuitive nature makes you deeply reflective and insightful.",
+      "ENTP-A":
+        "You're innovative, curious, and quick-witted, with a love for intellectual challenges. Your extroverted and intuitive nature makes you excellent at generating new ideas.",
+      "ENTP-T":
+        "You're innovative, curious, and quick-witted, but may sometimes struggle with follow-through. Your extroverted and intuitive nature makes you excellent at generating new ideas.",
+      "INTJ-A":
+        "You're strategic, analytical, and independent, with a strong vision for the future. Your introverted and intuitive nature makes you excellent at solving complex problems.",
+      "INTJ-T":
+        "You're strategic, analytical, and independent, but may sometimes be overly critical. Your introverted and intuitive nature makes you excellent at solving complex problems.",
+      "ENTJ-A":
+        "You're confident, decisive, and natural leader, with a strong drive for achievement. Your extroverted and intuitive nature makes you excellent at organizing and leading others.",
+      "ENTJ-T":
+        "You're confident, decisive, and natural leader, but may sometimes be too demanding. Your extroverted and intuitive nature makes you excellent at organizing and leading others.",
+      "INFJ-A":
+        "You're insightful, compassionate, and determined, with a strong sense of purpose. Your introverted and intuitive nature makes you excellent at understanding others.",
+      "INFJ-T":
+        "You're insightful, compassionate, and determined, but may sometimes be too idealistic. Your introverted and intuitive nature makes you excellent at understanding others.",
+      "ENFJ-A":
+        "You're charismatic, empathetic, and organized, with a natural ability to inspire others. Your extroverted and intuitive nature makes you excellent at motivating and leading teams.",
+      "ENFJ-T":
+        "You're charismatic, empathetic, and organized, but may sometimes be too self-sacrificing. Your extroverted and intuitive nature makes you excellent at motivating and leading teams.",
+      "ISTJ-A":
+        "You're responsible, organized, and practical, with a strong sense of duty. Your introverted and sensing nature makes you excellent at maintaining order and stability.",
+      "ISTJ-T":
+        "You're responsible, organized, and practical, but may sometimes be too rigid. Your introverted and sensing nature makes you excellent at maintaining order and stability.",
+      "ESTJ-A":
+        "You're efficient, organized, and direct, with a strong sense of tradition. Your extroverted and sensing nature makes you excellent at managing and organizing people.",
+      "ESTJ-T":
+        "You're efficient, organized, and direct, but may sometimes be too controlling. Your extroverted and sensing nature makes you excellent at managing and organizing people.",
+      "ISFJ-A":
+        "You're caring, organized, and loyal, with a strong sense of responsibility. Your introverted and sensing nature makes you excellent at supporting and helping others.",
+      "ISFJ-T":
+        "You're caring, organized, and loyal, but may sometimes be too self-sacrificing. Your introverted and sensing nature makes you excellent at supporting and helping others.",
+      "ESFJ-A":
+        "You're sociable, caring, and organized, with a strong sense of community. Your extroverted and sensing nature makes you excellent at creating harmony and supporting others.",
+      "ESFJ-T":
+        "You're sociable, caring, and organized, but may sometimes be too sensitive to criticism. Your extroverted and sensing nature makes you excellent at creating harmony and supporting others.",
+      "ISTP-A":
+        "You're practical, analytical, and spontaneous, with a love for hands-on activities. Your introverted and sensing nature makes you excellent at solving practical problems.",
+      "ISTP-T":
+        "You're practical, analytical, and spontaneous, but may sometimes be too private. Your introverted and sensing nature makes you excellent at solving practical problems.",
+      "ESTP-A":
+        "You're energetic, practical, and spontaneous, with a love for action and adventure. Your extroverted and sensing nature makes you excellent at thinking on your feet.",
+      "ESTP-T":
+        "You're energetic, practical, and spontaneous, but may sometimes be too impulsive. Your extroverted and sensing nature makes you excellent at thinking on your feet.",
+      "ISFP-A":
+        "You're artistic, gentle, and adaptable, with a strong appreciation for beauty. Your introverted and sensing nature makes you excellent at creating and appreciating art.",
+      "ISFP-T":
+        "You're artistic, gentle, and adaptable, but may sometimes be too sensitive. Your introverted and sensing nature makes you excellent at creating and appreciating art.",
+      "ESFP-A":
+        "You're spontaneous, enthusiastic, and friendly, with a love for life and people. Your extroverted and sensing nature makes you excellent at entertaining and engaging others.",
+      "ESFP-T":
+        "You're spontaneous, enthusiastic, and friendly, but may sometimes be too impulsive. Your extroverted and sensing nature makes you excellent at entertaining and engaging others.",
     };
 
     return (

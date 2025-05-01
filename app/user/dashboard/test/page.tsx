@@ -12,6 +12,8 @@ import TestTimer from "./timer/page";
 import { calculateScores } from "../report/page";
 import QuestionCard from "../../components/QuestionCard";
 import SignupModal from "../../../components/authentication/SignupModal";
+import { PersonalityService } from "../../../services/personality.service";
+import { Answer } from "../../../types/test";
 
 interface Option {
   id: string;
@@ -65,36 +67,56 @@ export default function TestPage() {
 
   const handleSubmit = async () => {
     console.log("answers");
-    // Convert answers to the format expected by calculateScores
-    const formattedAnswers: Record<string, string> = {};
+    // Split answers into two parts
+    const aptitudeAnswers: Record<string, string> = {};
+    const personalityAnswers: Record<string, string> = {};
+
+    // First 12 questions for aptitude test
     Object.entries(answers).forEach(([questionId, answer]) => {
-      formattedAnswers[questionId] = answer;
+      if (parseInt(questionId) <= 12) {
+        aptitudeAnswers[questionId] = answer;
+      } else {
+        personalityAnswers[questionId] = answer;
+      }
     });
 
-    console.log("Formatted Answers:", formattedAnswers);
+    // Format questions for aptitude score calculation
+    const aptitudeQuestions = questions
+      .filter((q) => parseInt(q.id) <= 12)
+      .map((q) => ({
+        id: q.id,
+        category: q.category,
+      }));
 
-    // Format questions for score calculation
-    const questionsForScoring = questions.map((q) => ({
-      id: q.id,
-      category: q.category,
+    // Format answers for personality test
+    const personalityTestAnswers: Answer[] = Object.entries(
+      personalityAnswers
+    ).map(([questionId, answer]) => ({
+      questionId: parseInt(questionId),
+      answer: answer === "1" ? "yes" : ("no" as const),
     }));
 
-    console.log("Questions for Scoring:", questionsForScoring);
-
     try {
-      // Calculate the test results
-      const testResults = calculateScores(
-        formattedAnswers,
-        questionsForScoring
+      // Calculate aptitude test results
+      const aptitudeResults = calculateScores(
+        aptitudeAnswers,
+        aptitudeQuestions
       );
-      console.log("Test Results before storage:", testResults);
 
-      // Store results in localStorage
-      localStorage.setItem("testResults", JSON.stringify(testResults));
+      // Calculate personality test results
+      const personalityService = new PersonalityService();
+      const personalityResults = personalityService.calculatePersonalityTraits(
+        personalityTestAnswers
+      );
 
-      // Verify storage
-      const storedResults = localStorage.getItem("testResults");
-      console.log("Stored Results:", storedResults);
+      console.log("Personality Results:", personalityResults); // Debug log
+
+      // Store both results in localStorage
+      localStorage.setItem("aptitudeResults", JSON.stringify(aptitudeResults));
+      localStorage.setItem(
+        "personalityResults",
+        JSON.stringify(personalityResults)
+      );
 
       // Open signup modal instead of navigating to results
       setIsModalOpen(true);

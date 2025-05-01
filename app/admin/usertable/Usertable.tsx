@@ -122,14 +122,14 @@ export default function UsersTable({ users }: UsersTableProps) {
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
                           >
-                            {user.class_name.name}
+                            {user.class_name?.name}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
                           >
-                            {user.stream_name.name}
+                            {user.stream_name?.name}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

@@ -278,6 +278,42 @@ interface PsychometricReportPDFProps {
       score: number;
       interpretation: string;
     }>;
+    personalityTraits?: {
+      type: string;
+      description: string;
+      traits: {
+        EI: {
+          primary: string;
+          secondary: string;
+          score: number;
+          color: string;
+        };
+        SN: {
+          primary: string;
+          secondary: string;
+          score: number;
+          color: string;
+        };
+        TF: {
+          primary: string;
+          secondary: string;
+          score: number;
+          color: string;
+        };
+        JP: {
+          primary: string;
+          secondary: string;
+          score: number;
+          color: string;
+        };
+        AT: {
+          primary: string;
+          secondary: string;
+          score: number;
+          color: string;
+        };
+      };
+    };
   };
 }
 
@@ -377,6 +413,55 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
             </View>
           ))}
         </View>
+
+        {/* Personality Traits Section */}
+        {userData.personalityTraits && (
+          <View style={styles.section}>
+            <View style={styles.sectionTitle}>
+              <Text>Personality Profile</Text>
+            </View>
+
+            {/* Personality Type */}
+            <View style={styles.infoRow}>
+              <Text style={styles.infoText}>Your Personality Type:</Text>
+              <Text style={styles.scoreText}>
+                {userData.personalityTraits.type}
+              </Text>
+            </View>
+
+            {/* Personality Description */}
+            <View style={styles.infoRow}>
+              <Text style={styles.infoText}>
+                {userData.personalityTraits.description}
+              </Text>
+            </View>
+
+            {/* Personality Traits */}
+            {Object.entries(userData.personalityTraits.traits).map(
+              ([dimension, trait]) => (
+                <View key={dimension} style={styles.interestBar}>
+                  <View style={styles.interestLabel}>
+                    <Text style={styles.labelText}>
+                      {trait.primary} vs {trait.secondary}
+                    </Text>
+                    <Text style={styles.scoreText}>{trait.score}%</Text>
+                  </View>
+                  <View style={styles.progressBarContainer}>
+                    <View
+                      style={[
+                        styles.progressBarHigh,
+                        {
+                          width: `${trait.score}%`,
+                          backgroundColor: trait.color,
+                        },
+                      ]}
+                    />
+                  </View>
+                </View>
+              )
+            )}
+          </View>
+        )}
 
         {/* Career Recommendations */}
         <View style={styles.section}>

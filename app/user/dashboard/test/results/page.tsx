@@ -41,23 +41,28 @@ const ResultsPage = () => {
 
   useEffect(() => {
     try {
-      const storedResults = localStorage.getItem("testResults");
-      if (!storedResults) return;
+      // Get aptitude results
+      const storedAptitudeResults = localStorage.getItem("aptitudeResults");
+      const storedPersonalityResults =
+        localStorage.getItem("personalityResults");
 
-      const parsedResults = JSON.parse(storedResults);
-      if (!parsedResults || !parsedResults.scores) {
+      if (!storedAptitudeResults || !storedPersonalityResults) {
+        toast.error("Test results not found");
+        return;
+      }
+
+      const aptitudeResults = JSON.parse(storedAptitudeResults);
+      const personalityResults = JSON.parse(storedPersonalityResults);
+
+      console.log("Loaded Personality Results:", personalityResults); // Debug log
+
+      if (!aptitudeResults || !personalityResults) {
         toast.error("Invalid test results format");
         return;
       }
 
-      // Get personality results
-      const personalityService = new PersonalityService();
-      const personalityResults = personalityService.calculatePersonalityTraits(
-        parsedResults.answers || []
-      );
-
       setResults({
-        ...parsedResults,
+        ...aptitudeResults,
         personalityTraits: personalityResults,
       });
     } catch (error) {
@@ -112,6 +117,44 @@ const ResultsPage = () => {
         },
       ],
       scores: results.scores,
+      personalityTraits: results.personalityTraits
+        ? {
+            type: results.personalityTraits.type,
+            description: results.personalityTraits.description,
+            traits: {
+              EI: {
+                primary: results.personalityTraits.traits.EI.primary,
+                secondary: results.personalityTraits.traits.EI.secondary,
+                score: results.personalityTraits.traits.EI.score,
+                color: results.personalityTraits.traits.EI.color,
+              },
+              SN: {
+                primary: results.personalityTraits.traits.SN.primary,
+                secondary: results.personalityTraits.traits.SN.secondary,
+                score: results.personalityTraits.traits.SN.score,
+                color: results.personalityTraits.traits.SN.color,
+              },
+              TF: {
+                primary: results.personalityTraits.traits.TF.primary,
+                secondary: results.personalityTraits.traits.TF.secondary,
+                score: results.personalityTraits.traits.TF.score,
+                color: results.personalityTraits.traits.TF.color,
+              },
+              JP: {
+                primary: results.personalityTraits.traits.JP.primary,
+                secondary: results.personalityTraits.traits.JP.secondary,
+                score: results.personalityTraits.traits.JP.score,
+                color: results.personalityTraits.traits.JP.color,
+              },
+              AT: {
+                primary: results.personalityTraits.traits.AT.primary,
+                secondary: results.personalityTraits.traits.AT.secondary,
+                score: results.personalityTraits.traits.AT.score,
+                color: results.personalityTraits.traits.AT.color,
+              },
+            },
+          }
+        : undefined,
     };
   };
 
@@ -328,81 +371,6 @@ const ResultsPage = () => {
             </div>
           </div>
 
-          {/* Personality Traits Section */}
-          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
-            <h2 className="text-xl font-semibold text-gray-100 mb-6 flex items-center">
-              <FiBookOpen className="mr-2 text-orange-500" /> Personality Traits
-            </h2>
-
-            <div className="space-y-6">
-              {results?.personalityTraits &&
-                Object.entries(results.personalityTraits.traits).map(
-                  ([dimension, trait]) => (
-                    <div
-                      key={dimension}
-                      className={`relative ${
-                        dimension === "JP"
-                          ? "bg-gray-800/50 p-4 rounded-lg"
-                          : ""
-                      }`}
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-300">{trait.primary}</span>
-                        <span
-                          className={`text-${trait.color.replace(
-                            "#",
-                            ""
-                          )}-400 font-semibold`}
-                        >
-                          {trait.score}%
-                        </span>
-                        <span className="text-gray-400">{trait.secondary}</span>
-                      </div>
-                      <div className="relative h-2 bg-gray-700 rounded-full">
-                        <div
-                          className={`absolute left-0 h-full bg-${trait.color.replace(
-                            "#",
-                            ""
-                          )}-500 rounded-full`}
-                          style={{ width: `${trait.score}%` }}
-                        />
-                        <div
-                          className={`absolute w-4 h-4 bg-white border-2 border-${trait.color.replace(
-                            "#",
-                            ""
-                          )}-500 rounded-full -mt-1 transform -translate-x-1/2`}
-                          style={{ left: `${trait.score}%` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                )}
-            </div>
-
-            {/* Personality Description */}
-            {results?.personalityTraits && (
-              <div className="mt-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">
-                    <img
-                      src="/images/personality-icon.png"
-                      alt="Personality Type"
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-100 mb-2">
-                      {results.personalityTraits.type}
-                    </h3>
-                    <p className="text-gray-300">
-                      {results.personalityTraits.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Interest Description Section */}
           <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
             <div className="space-y-8">
@@ -493,6 +461,92 @@ const ResultsPage = () => {
                     </div>
                   );
                 })}
+            </div>
+          </div>
+
+          {/* Personality Traits Section */}
+          <div className="bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-100 mb-6 flex items-center">
+              <FiBookOpen className="mr-2 text-orange-500" /> Personality Traits
+            </h2>
+
+            {/* Personality Type and Description */}
+            {results?.personalityTraits && (
+              <div className="mb-8 p-4 bg-gray-800/50 rounded-lg border border-gray-700">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="h-16 px-2 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <span className="text-2xl font-bold text-white">
+                        {results.personalityTraits.type}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-2">
+                      Your Personality Type: {results.personalityTraits.type}
+                    </h3>
+                    <p className="text-gray-300">
+                      {results.personalityTraits.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Personality Dimensions */}
+            <div className="space-y-6">
+              {results?.personalityTraits?.traits &&
+                Object.entries(results.personalityTraits.traits).map(
+                  ([dimension, trait]) => {
+                    console.log("Rendering trait:", dimension, trait); // Debug log
+                    return (
+                      <div key={dimension} className="relative">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-gray-300 font-medium">
+                            {trait.secondary}
+                          </span>
+                          <span className="text-gray-400 font-medium">
+                            {trait.primary}
+                          </span>
+                        </div>
+
+                        {/* Score Bar */}
+                        <div className="relative h-4 bg-gray-700 rounded-full overflow-hidden">
+                          <div
+                            className="absolute left-0 h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${trait.score}%`,
+                              backgroundColor: trait.color,
+                            }}
+                          />
+                          <div
+                            className="absolute top-0 h-full w-0.5 bg-white"
+                            style={{ left: `${trait.score}%` }}
+                          />
+                        </div>
+
+                        {/* Score Label */}
+                        <div className="flex justify-between mt-1">
+                          <span className="text-sm text-gray-400">0%</span>
+                          <span
+                            className="text-sm font-medium"
+                            style={{ color: trait.color }}
+                          >
+                            {trait.score}%
+                          </span>
+                          <span className="text-sm text-gray-400">100%</span>
+                        </div>
+
+                        {/* Trait Description */}
+                        <p className="mt-2 text-sm text-gray-400">
+                          {trait.score >= 50
+                            ? `You show strong ${trait.primary.toLowerCase()} tendencies`
+                            : `You show strong ${trait.secondary.toLowerCase()} tendencies`}
+                        </p>
+                      </div>
+                    );
+                  }
+                )}
             </div>
           </div>
 
