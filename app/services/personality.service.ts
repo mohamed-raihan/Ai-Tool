@@ -123,6 +123,7 @@ const dimensionColors = {
 
 export class PersonalityService {
   calculatePersonalityTraits(answers: Answer[]): PersonalityTraitResult {
+    
     // Initialize counters for each trait
     const traitCounters = {
       EI: { primary: 0, secondary: 0, total: 0 },
@@ -132,6 +133,7 @@ export class PersonalityService {
       AT: { primary: 0, secondary: 0, total: 0 },
     };
 
+    
     // Process each answer
     answers.forEach((answer) => {
       const mapping = questionMappings[answer.questionId];

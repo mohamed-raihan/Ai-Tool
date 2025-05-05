@@ -4,22 +4,32 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { careerService, Career } from "@/app/services/careers.service";
 import { FaPencilAlt, FaTrash } from "react-icons/fa";
+import api from "@/app/lib/axios";
+import { API_URL } from "@/app/services/api_url";
 
 const defaultCareer: Career = {
   name: "",
   description: "",
   education_pathway: [],
   category: "",
+  traits: [],
 };
+
+interface Category {
+  id: number;
+  name: string;
+}
 
 export default function CareersPage() {
   const [careers, setCareers] = useState<Career[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCareer, setSelectedCareer] = useState<Career | null>(null);
   const [formData, setFormData] = useState<Career>(defaultCareer);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     fetchCareers();
+    fetchCategory();
   }, []);
 
   const fetchCareers = async () => {
@@ -33,6 +43,15 @@ export default function CareersPage() {
     }
   };
 
+  const fetchCategory = async () => {
+    try {
+      const response = await api.get(API_URL.ADMIN.CATEGORY);
+      setCategories(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch categories");
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -40,9 +59,10 @@ export default function CareersPage() {
         await careerService.updateCareer(selectedCareer.id, formData);
         toast.success("Career updated successfully");
       } else {
-        await careerService.createCareer(formData);
+        const data = await careerService.createCareer(formData);
         toast.success("Career added successfully");
         console.log("career added successfully");
+        console.log(data);
       }
       fetchCareers();
       resetForm();
@@ -139,14 +159,35 @@ export default function CareersPage() {
               </div>
               <div>
                 <label className="block text-gray-300 mb-2">Category ID</label>
-                <input
-                  type="text"
+                <select
                   value={formData.category}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
                   }
                   className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
                   required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-gray-300 mb-2">Traits</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Analytical, Creative, etc."
+                  value={formData.traits}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      traits: e.target.value.split(","),
+                    })
+                  }
+                  className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
                 />
               </div>
               <div className="flex space-x-4">
@@ -213,10 +254,10 @@ export default function CareersPage() {
                       : career.description}
                   </p>
                   <div className="text-sm text-gray-400">
-                    <div className="mb-1">
+                    {/* <div className="mb-1">
                       <span className="font-medium">Category:</span>{" "}
                       <span className="text-orange-400">{career.category}</span>
-                    </div>
+                    </div> */}
                     <div className="flex gap-1">
                       <span className="font-medium mt-2">Education:</span>
                       <div className="flex flex-wrap gap-1 mt-1">
@@ -226,6 +267,19 @@ export default function CareersPage() {
                             className="bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"
                           >
                             {path.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex gap-1 mt-2">
+                      <span className="font-medium mt-1">Traits:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {career.traits?.map((trait, index) => (
+                          <span
+                            key={index}
+                            className="bg-gray-800 text-gray-300 px-2 py-1 rounded text-xs"
+                          >
+                            {trait.trim()}
                           </span>
                         ))}
                       </div>

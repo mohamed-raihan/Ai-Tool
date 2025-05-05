@@ -68,6 +68,15 @@ const ResultsPage = () => {
         return;
       }
 
+      // Check if all scores are 0 (all answers were "No")
+      const allScoresZero = aptitudeResults.scores.every(
+        (score: { score: number }) => score.score === 0
+      );
+      if (allScoresZero) {
+        setResults(null);
+        return;
+      }
+
       setResults({
         ...aptitudeResults,
         personalityTraits: personalityResults,
@@ -86,8 +95,12 @@ const ResultsPage = () => {
     const student = JSON.parse(sessionStorage.getItem("student") || "{}");
     console.log(student);
 
-    const aptitudeResults = JSON.parse(localStorage.getItem("aptitudeResults") || "{}");
-    const personalityResults = JSON.parse(localStorage.getItem("personalityResults") || "{}");
+    const aptitudeResults = JSON.parse(
+      localStorage.getItem("aptitudeResults") || "{}"
+    );
+    const personalityResults = JSON.parse(
+      localStorage.getItem("personalityResults") || "{}"
+    );
 
     console.log(aptitudeResults);
     console.log(personalityResults);
@@ -96,9 +109,9 @@ const ResultsPage = () => {
       try {
         const response = await api.post(API_URL.RESULT.POST_RESULT, {
           student_uuid: student.student_uuid,
-          "aptitude_test": aptitudeResults,
-          "personality_test": personalityResults,
-          "summary": "results",
+          aptitude_test: aptitudeResults,
+          personality_test: personalityResults,
+          summary: "results",
         });
         console.log(response);
       } catch (error) {
@@ -247,13 +260,14 @@ const ResultsPage = () => {
             No Results Found
           </h2>
           <p className="text-gray-400 mb-4">
-            Please complete the test to see your results.
+            All questions were answered as "No". Please retake the test and
+            provide more varied responses for accurate results.
           </p>
           <Link
             href="/user/dashboard/test"
             className="inline-block px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
           >
-            Take Test
+            Retake Test
           </Link>
         </div>
       </div>

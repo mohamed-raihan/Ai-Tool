@@ -6,6 +6,7 @@ export interface Career {
   description: string;
   education_pathway: string[];
   category: string;
+  traits: string[];
 }
 
 class CareerService {

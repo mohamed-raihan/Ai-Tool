@@ -32,7 +32,7 @@ function QuestionsPage() {
   >([]);
   const [newQuestion, setNewQuestion] = useState<CreateQuestionDto>({
     text: "",
-    category: "",
+    category_id: "",
     class_id: "",
     stream_id: "",
   });
@@ -40,7 +40,7 @@ function QuestionsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<CreateQuestionDto>({
     text: "",
-    category: "",
+    category_id: "",
     class_id: "",
     stream_id: "",
   });
@@ -88,7 +88,7 @@ function QuestionsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newQuestion.text.trim() || !newQuestion.category.trim()) {
+    if (!newQuestion.text.trim() || !newQuestion.category_id.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -98,7 +98,7 @@ function QuestionsPage() {
     try {
       await questionsService.createQuestion(newQuestion);
       toast.success("Question added successfully",{autoClose: 1000});
-      setNewQuestion({ text: "", category: "", class_id: "", stream_id: "" }); // Clear form
+      setNewQuestion({ text: "", category_id: "", class_id: "", stream_id: "" }); // Clear form
       fetchQuestions(); // Refresh questions list
     } catch (error) {
       toast.error("Failed to add question");
@@ -123,25 +123,25 @@ function QuestionsPage() {
 
   const startEditing = (question: Question) => {
     console.log(
-      question.class_name?.id.toString(),
-      question.stream_name?.id.toString()
+      question.class_name?.toString(),
+      question.stream_name?.toString()
     );
     setEditingId(question.id);
     setEditForm({
       text: question.text,
-      category: question.category.toString(),
-      class_id: question.class_name?.id.toString() || "",
-      stream_id: question.stream_name?.id.toString() || "",
+      category_id: question.category.toString(),
+      class_id: question.class_name?.toString() || "",
+      stream_id: question.stream_name?.toString() || "",
     });
   };
 
   const cancelEditing = () => {
     setEditingId(null);
-    setEditForm({ text: "", category: "", class_id: "", stream_id: "" });
+    setEditForm({ text: "", category_id: "", class_id: "", stream_id: "" });
   };
 
   const handleUpdate = async (id: string) => {
-    if (!editForm.text.trim() || !editForm.category.trim()) {
+    if (!editForm.text.trim() || !editForm.category_id.trim()) {
       toast.error("Please fill in all fields");
       return;
     }
@@ -280,11 +280,11 @@ function QuestionsPage() {
                   </label>
                   <select
                     id="category"
-                    value={newQuestion.category}
+                    value={newQuestion.category_id}
                     onChange={(e) =>
                       setNewQuestion({
                         ...newQuestion,
-                        category: e.target.value,
+                        category_id: e.target.value,
                       })
                     }
                     className="w-full px-3 py-2 bg-gray-700 border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -370,7 +370,7 @@ function QuestionsPage() {
                       </span>
                     </div>
                     <div className="flex-1">
-                      {editingId === question.id ? (
+                      {editingId === question.id.toString() ? (
                         // Edit Form
                         <div className="space-y-3">
                           <textarea
@@ -383,11 +383,11 @@ function QuestionsPage() {
                           />
                           <input
                             type="text"
-                            value={editForm.category}
+                            value={editForm.category_id}
                             onChange={(e) =>
                               setEditForm({
                                 ...editForm,
-                                category: e.target.value,
+                                category_id: e.target.value,
                               })
                             }
                             className="w-full px-3 py-2 bg-gray-700 border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -416,7 +416,7 @@ function QuestionsPage() {
                           <p className="mt-2 text-sm text-gray-400">
                             Category:{" "}
                             <span className="font-medium text-gray-300">
-                              {question.category}
+                              {question.category?.name}
                             </span>
                           </p>
                           <div className="mt-3 flex space-x-2">
@@ -427,7 +427,7 @@ function QuestionsPage() {
                               <FiEdit2 className="mr-1" />
                             </button>
                             <button
-                              onClick={() => handleDelete(question.id)}
+                              onClick={() => handleDelete(question.id.toString()  )}
                               className="flex items-center px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700"
                             >
                               <FiTrash2 className="mr-1" />

@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TestPage from "./test/page";
 import ProfileWizard from "./profile/page";
+import { SiChatbot } from "react-icons/si";
+import ChatBotPage from "./chatBot/page";
 
 // Define types for our component
 type MenuItem = string;
@@ -71,6 +73,11 @@ const Dashboard: NextPage = () => {
     // router.push("/user/dashboard/profile");
   };
 
+  const handleChatbotNavigation = () => {
+    setActiveMenuItem("chatbot");
+    // router.push("/user/dashboard/chatbot");
+  };
+
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
@@ -132,6 +139,15 @@ const Dashboard: NextPage = () => {
           onClick={handleProfileNavigation}
         >
           <User size={20} />
+        </button>
+
+        <button
+          className={`p-3 rounded-lg ${
+            activeMenuItem === "chatbot" ? "bg-gray-800" : "hover:bg-gray-800"
+          }`}
+          onClick={handleChatbotNavigation}
+        >
+          <SiChatbot size={20} />
         </button>
 
         <div className="mt-auto">
@@ -588,6 +604,12 @@ const Dashboard: NextPage = () => {
       {activeMenuItem === "profile" && (
         <div className="w-full ml-16">
           <ProfileWizard />
+        </div>
+      )}
+
+      {activeMenuItem === "chatbot" && (
+        <div className="w-full ml-16">
+          <ChatBotPage />
         </div>
       )}
     </div>

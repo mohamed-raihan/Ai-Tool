@@ -40,7 +40,10 @@ export const API_URL = {
     RESULT: {
         GET_RESULT: (uuid: string) => `/api/result/${uuid}/`,
         POST_RESULT: '/api/result-create/',
-    }
+    },
+    CHATBOT: {
+        GET_CHATBOT: '/api/ask/',
+    },
 
     
 }

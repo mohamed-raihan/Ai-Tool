@@ -85,7 +85,7 @@ export default function TestPage() {
       .filter((q) => parseInt(q.id) <= 12)
       .map((q) => ({
         id: q.id,
-        category: q.category,
+        category: q.category.name,
       }));
 
     // Format answers for personality test
