@@ -26,6 +26,10 @@ export default function UsersTable({ users }: UsersTableProps) {
     router.push(`/admin/usertable/${userId}`);
   };
 
+  const handleResultsClick = (userId: string) => {
+    router.push(`/admin/usertable/${userId}/results`);
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 p-8">
       <div className="max-w-7xl mx-auto">
@@ -133,12 +137,20 @@ export default function UsersTable({ users }: UsersTableProps) {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button
-                            onClick={() => handleProfileClick(user.id)}
-                            className="text-orange-500 hover:text-orange-400 bg-orange-500/10 px-4 py-2 rounded-lg transition-colors"
-                          >
-                            View Profile
-                          </button>
+                          <div className="flex space-x-2 justify-end">
+                            <button
+                              onClick={() => handleProfileClick(user.id)}
+                              className="text-orange-500 hover:text-orange-400 bg-orange-500/10 px-4 py-2 rounded-lg transition-colors"
+                            >
+                              View Profile
+                            </button>
+                            <button
+                              onClick={() => handleResultsClick(user.id)}
+                              className="text-blue-500 hover:text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg transition-colors"
+                            >
+                              View Results
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

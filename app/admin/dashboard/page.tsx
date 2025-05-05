@@ -11,6 +11,10 @@ import AdminUsersPage from "../usertable/page";
 import QuestionCard from "@/app/admin/questions/page";
 import CareersPage from "../careers/page";
 import { FaUserGraduate } from "react-icons/fa";
+import { BiCategory } from "react-icons/bi";
+import CategoryManagement from "../category/page";
+import { RiMoneyRupeeCircleLine } from "react-icons/ri";
+import PaymentManagement from "../payment/page";
 
 // Define types for our component
 type MenuItem = string;
@@ -81,6 +85,16 @@ const Dashboard: NextPage = () => {
 
   const handlecreerNavigation = () => {
     setActiveMenuItem("creer");
+    // router.push("/admin/usertable");
+  };
+
+  const handlecategoryNavigation = () => {
+    setActiveMenuItem("category");
+    // router.push("/admin/usertable");
+  };
+
+  const handlepaymentNavigation = () => {
+    setActiveMenuItem("payment");
     // router.push("/admin/usertable");
   };
 
@@ -157,12 +171,32 @@ const Dashboard: NextPage = () => {
         </button>
 
         <button
-          className={`p-3 rounded-lg ${
+          className={`p-3 rounded-lg mb-2 ${
             activeMenuItem === "creer" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
           onClick={handlecreerNavigation}
         >
           <FaUserGraduate size={20} />
+          {/* <FilePlus size={20} /> */}
+        </button>
+
+        <button
+          className={`p-3 rounded-lg mb-2 ${
+            activeMenuItem === "category" ? "bg-gray-800" : "hover:bg-gray-800"
+          }`}
+          onClick={handlecategoryNavigation}
+        >
+          <BiCategory size={20} />
+          {/* <FilePlus size={20} /> */}
+        </button>
+
+        <button
+          className={`p-3 rounded-lg ${
+            activeMenuItem === "payment" ? "bg-gray-800" : "hover:bg-gray-800"
+          }`}
+          onClick={handlepaymentNavigation}
+        >
+          <RiMoneyRupeeCircleLine size={20} />
           {/* <FilePlus size={20} /> */}
         </button>
 
@@ -632,6 +666,18 @@ const Dashboard: NextPage = () => {
       {activeMenuItem === "creer" && (
         <div className="w-full">
           <CareersPage />
+        </div>
+      )}
+
+      {activeMenuItem === "category" && (
+        <div className="w-full">
+          <CategoryManagement />
+        </div>
+      )}
+
+      {activeMenuItem === "payment" && (
+        <div className="w-full">
+          <PaymentManagement />
         </div>
       )}
     </div>

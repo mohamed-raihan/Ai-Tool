@@ -74,7 +74,7 @@ const Dashboard: NextPage = () => {
   return (
     <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
-      <div className="w-16 flex flex-col items-center py-8 border-r border-gray-800">
+      <div className="w-16 flex flex-col items-center py-8 border-r border-gray-800 fixed h-screen">
         <div className="mb-8">
           <svg
             width="24"
@@ -153,7 +153,7 @@ const Dashboard: NextPage = () => {
 
       {/* Main Content */}
       {activeMenuItem === "home" && (
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto ml-16">
           {/* Header */}
           <header className="flex justify-between items-center p-4 border-b border-gray-800">
             <div className="flex gap-5 ms-3">
@@ -580,13 +580,13 @@ const Dashboard: NextPage = () => {
       )}
 
       {activeMenuItem === "test" && (
-        <div className="w-full">
+        <div className="w-full ml-16">
           <TestPage />
         </div>
       )}
 
       {activeMenuItem === "profile" && (
-        <div className="w-full">
+        <div className="w-full ml-16">
           <ProfileWizard />
         </div>
       )}

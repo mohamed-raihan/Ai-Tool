@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import { FiEdit2, FiTrash2, FiX, FiCheck } from "react-icons/fi";
 import { API_URL } from "@/app/services/api_url";
 import api from "@/app/lib/axios";
+import { Select } from "@react-pdf/renderer";
 
 interface Class {
   id: number;
@@ -17,9 +18,15 @@ interface Class {
   streams: { id: number; name: string }[];
 }
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedStreams, setSelectedStreams] = useState<
     { id: number; name: string }[]
   >([]);
@@ -46,14 +53,17 @@ function QuestionsPage() {
   useEffect(() => {
     fetchQuestions();
     fetchClasses();
+    fetchCategories();
   }, []);
 
   const fetchQuestions = async () => {
     try {
       const data = await questionsService.getQuestions();
+      console.log(data);
       setQuestions(data);
     } catch (error) {
-      toast.error("Failed to fetch questions");
+      toast.error("Failed to fetch questions",{autoClose: 1000});
+      console.error("Error fetching questions:", error);
     }
   };
 
@@ -64,6 +74,15 @@ function QuestionsPage() {
       setClasses(response.data);
     } catch (error) {
       toast.error("Failed to fetch classes");
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get(API_URL.ADMIN.CATEGORY);
+      setCategories(response.data);
+    } catch (error) {
+      toast.error("Failed to fetch categories");
     }
   };
 
@@ -78,7 +97,7 @@ function QuestionsPage() {
     console.log(newQuestion);
     try {
       await questionsService.createQuestion(newQuestion);
-      toast.success("Question added successfully");
+      toast.success("Question added successfully",{autoClose: 1000});
       setNewQuestion({ text: "", category: "", class_id: "", stream_id: "" }); // Clear form
       fetchQuestions(); // Refresh questions list
     } catch (error) {
@@ -104,15 +123,15 @@ function QuestionsPage() {
 
   const startEditing = (question: Question) => {
     console.log(
-      question.class_name.id.toString(),
-      question.stream_name.id.toString()
+      question.class_name?.id.toString(),
+      question.stream_name?.id.toString()
     );
     setEditingId(question.id);
     setEditForm({
       text: question.text,
-      category: question.category,
-      class_id: question.class_name.id.toString(),
-      stream_id: question.stream_name.id.toString(),
+      category: question.category.toString(),
+      class_id: question.class_name?.id.toString() || "",
+      stream_id: question.stream_name?.id.toString() || "",
     });
   };
 
@@ -161,11 +180,11 @@ function QuestionsPage() {
 
   const filteredQuestions = questions.filter((question) => {
     if (!filterClass) return true;
-    console.log(question.class_name.id, parseInt(filterClass));
-    if (question.class_name.id !== parseInt(filterClass)) return false;
+    console.log(question.class_name?.id, parseInt(filterClass));
+    if (question.class_name?.id !== parseInt(filterClass)) return false;
     if (!filterStream) return true;
-    console.log(question.stream_name.id, parseInt(filterStream));
-    return question.stream_name.id === parseInt(filterStream);
+    console.log(question.stream_name?.id, parseInt(filterStream));
+    return question.stream_name?.id === parseInt(filterStream);
   });
 
   return (
@@ -257,10 +276,9 @@ function QuestionsPage() {
                     htmlFor="category"
                     className="block text-sm font-medium text-gray-300 mb-1"
                   >
-                    Category (format: Category1,Category2)
+                    Category
                   </label>
-                  <input
-                    type="text"
+                  <select
                     id="category"
                     value={newQuestion.category}
                     onChange={(e) =>
@@ -271,7 +289,14 @@ function QuestionsPage() {
                     }
                     className="w-full px-3 py-2 bg-gray-700 border-gray-600 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     required
-                  />
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <button
                   type="submit"

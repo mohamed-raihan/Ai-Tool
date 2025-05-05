@@ -16,6 +16,10 @@ import {
   PersonalityService,
   PersonalityTraitResult,
 } from "@/app/services/personality.service";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import api from "@/app/lib/axios";
+import { API_URL } from "@/app/services/api_url";
 
 interface TestResult {
   testName: string;
@@ -35,6 +39,9 @@ interface TestResult {
 const ResultsPage = () => {
   const [results, setResults] = useState<TestResult | null>(null);
   const [showPDF, setShowPDF] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const router = useRouter();
 
   const matchingCareers = findMatchingCareers(results?.scores || []);
   console.log(matchingCareers);
@@ -69,6 +76,37 @@ const ResultsPage = () => {
       console.error("Error loading test results:", error);
       toast.error("Failed to load test results");
     }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasSubscription(sessionStorage.getItem("hasSubscription") === "true");
+    }
+
+    const student = JSON.parse(sessionStorage.getItem("student") || "{}");
+    console.log(student);
+
+    const aptitudeResults = JSON.parse(localStorage.getItem("aptitudeResults") || "{}");
+    const personalityResults = JSON.parse(localStorage.getItem("personalityResults") || "{}");
+
+    console.log(aptitudeResults);
+    console.log(personalityResults);
+
+    const saveResults = async () => {
+      try {
+        const response = await api.post(API_URL.RESULT.POST_RESULT, {
+          student_uuid: student.student_uuid,
+          "aptitude_test": aptitudeResults,
+          "personality_test": personalityResults,
+          "summary": "results",
+        });
+        console.log(response);
+      } catch (error) {
+        console.error("Error saving results:", error);
+      }
+    };
+
+    saveResults();
   }, []);
 
   console.log(results);
@@ -555,22 +593,22 @@ const ResultsPage = () => {
             <h2 className="text-xl font-semibold mb-4 text-gray-100">
               Career Recommendations
             </h2>
-            {results?.scores ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-700">
-                  <thead className="bg-gray-900">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                        Career Path
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                        Description
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
-                        Required Education
-                      </th>
-                    </tr>
-                  </thead>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-700">
+                <thead className="bg-gray-900">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Career Path
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      Required Education
+                    </th>
+                  </tr>
+                </thead>
+                {hasSubscription ? (
                   <tbody className="bg-gray-800 divide-y divide-gray-700">
                     {findMatchingCareers(results.scores).map(
                       (career, index) => (
@@ -596,14 +634,49 @@ const ResultsPage = () => {
                       )
                     )}
                   </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="text-center text-gray-500 py-4">
-                No career recommendations available. Please complete the test to
-                see your career matches.
-              </div>
-            )}
+                ) : (
+                  <tbody>
+                    <tr>
+                      <td colSpan={3} className="py-8">
+                        <div className="bg-gray-900 rounded-lg shadow-md p-8 border-t-4 border-orange-500 flex flex-col items-center max-w-md mx-auto">
+                          <div className="-mt-12 mb-2 flex justify-center w-full">
+                            <div className="bg-orange-500 rounded-full p-2 border-4 border-gray-900 shadow-lg">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-8 w-8 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 17a2 2 0 002-2v-2a2 2 0 00-2-2 2 2 0 00-2 2v2a2 2 0 002 2zm6-2v-2a6 6 0 10-12 0v2a2 2 0 00-2 2v2a2 2 0 002 2h12a2 2 0 002-2v-2a2 2 0 00-2-2z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                          <h3 className="text-lg font-semibold text-white mb-2 text-center">
+                            Unlock now
+                          </h3>
+                          <p className="text-gray-300 mb-6 text-center">
+                            Get the full report to discover your personalized
+                            career recommendations.
+                          </p>
+                          <button
+                            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full transition-colors"
+                            onClick={() => setShowSubscriptionModal(true)}
+                          >
+                            Get access now
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                )}
+              </table>
+            </div>
           </div>
 
           {/* Overall Interpretation */}
@@ -611,60 +684,191 @@ const ResultsPage = () => {
             <h2 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
               <FiBookOpen className="mr-2 text-orange-500" /> Summary
             </h2>
-            <div className="space-y-4">
-              {results.scores
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 2)
-                .map((trait, index) => {
-                  const strengthWords =
-                    index === 0
-                      ? "strongest characteristic"
-                      : "second strongest characteristic";
-                  return (
-                    <p key={index} className="text-gray-300">
-                      Your {strengthWords} is in the {trait.category} domain,
-                      with a score of {trait.score}%. This indicates{" "}
-                      {trait.interpretation}.
-                    </p>
-                  );
-                })}
-
-              <p className="text-gray-300 mt-4">
-                Based on your interest profile, you would excel in careers that
-                combine{" "}
+            {hasSubscription ? (
+              <div className="space-y-4">
                 {results.scores
                   .sort((a, b) => b.score - a.score)
                   .slice(0, 2)
-                  .map((trait) => trait.category.toLowerCase())
-                  .join(" and ")}{" "}
-                qualities. The recommended career paths align with your natural
-                inclinations and strengths, suggesting roles where you can{" "}
-                {findMatchingCareers(results.scores)
-                  .slice(0, 1)
-                  .map((career) => career.description.toLowerCase())
-                  .join(", ")}
-                .
-              </p>
-            </div>
+                  .map((trait, index) => {
+                    const strengthWords =
+                      index === 0
+                        ? "strongest characteristic"
+                        : "second strongest characteristic";
+                    return (
+                      <p key={index} className="text-gray-300">
+                        Your {strengthWords} is in the {trait.category} domain,
+                        with a score of {trait.score}%. This indicates{" "}
+                        {trait.interpretation}.
+                      </p>
+                    );
+                  })}
+
+                <p className="text-gray-300 mt-4">
+                  Based on your interest profile, you would excel in careers
+                  that combine{" "}
+                  {results.scores
+                    .sort((a, b) => b.score - a.score)
+                    .slice(0, 2)
+                    .map((trait) => trait.category.toLowerCase())
+                    .join(" and ")}{" "}
+                  qualities. The recommended career paths align with your
+                  natural inclinations and strengths, suggesting roles where you
+                  can{" "}
+                  {findMatchingCareers(results.scores)
+                    .slice(0, 1)
+                    .map((career) => career.description.toLowerCase())
+                    .join(", ")}
+                  .
+                </p>
+              </div>
+            ) : (
+              <div className="bg-gray-900 rounded-lg shadow-md p-8 border-t-4 border-orange-500 flex flex-col items-center max-w-md mx-auto">
+                <div className="-mt-12 mb-2 flex justify-center w-full">
+                  <div className="bg-orange-500 rounded-full p-2 border-4 border-gray-900 shadow-lg">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 17a2 2 0 002-2v-2a2 2 0 00-2-2 2 2 0 00-2 2v2a2 2 0 002 2zm6-2v-2a6 6 0 10-12 0v2a2 2 0 00-2 2v2a2 2 0 002 2h12a2 2 0 002-2v-2a2 2 0 00-2-2z"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold text-white mb-2 text-center">
+                  Unlock now
+                </h3>
+                <p className="text-gray-300 mb-6 text-center">
+                  Get the full report to discover more hidden strengths and
+                  insights.
+                </p>
+                <button
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded-full transition-colors"
+                  onClick={() => setShowSubscriptionModal(true)}
+                >
+                  Get access now
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-center space-x-4 mt-8">
+            {hasSubscription ? (
+              <Link
+                href="/user/dashboard/test"
+                className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+              >
+                Retake Test
+              </Link>
+            ) : (
+              <button
+                className="px-6 py-2 bg-gray-700 text-white rounded-md opacity-60 cursor-not-allowed"
+                disabled
+                title="Unlock premium to retake the test"
+              >
+                Retake Test
+              </button>
+            )}
             <Link
-              href="/user/dashboard/test"
-              className="px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
-            >
-              Retake Test
-            </Link>
-            {/* <Link
               href="/user/dashboard"
               className="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-600"
             >
               Return to Dashboard
-            </Link> */}
+            </Link>
           </div>
         </div>
       </div>
+
+      {/* Subscription Modal */}
+      {showSubscriptionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl max-w-3xl w-full flex flex-col md:flex-row p-8 relative border border-gray-800">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowSubscriptionModal(false)}
+              className="absolute top-4 right-4 text-orange-400 hover:text-orange-200 bg-gray-800 p-2 rounded-full"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+            {/* Illustration */}
+            <div className="flex-shrink-0 flex items-center justify-center md:mr-8 mb-8 md:mb-0">
+              {/* Replace src with your own illustration if available */}
+              {/* <img
+                src="/subscription-illustration.png"
+                alt="Unlock"
+                className="w-56 h-56 object-contain rounded-xl bg-gray-800 p-4"
+              /> */}
+              <Image
+                src="/prepMascot.png"
+                alt="Unlock"
+                className="object-contain rounded-xl"
+                width={300}
+                height={300}
+              />
+            </div>
+            {/* Content */}
+            <div className="flex-1 flex flex-col justify-center">
+              <span className="inline-block bg-orange-500/20 text-orange-400 text-xs font-semibold px-4 py-1 rounded-full mb-3 w-max">
+                UNLOCK NOW
+              </span>
+              <h2 className="text-3xl font-bold text-white mb-2">
+                Your story isn't complete yet
+              </h2>
+              <p className="text-gray-300 mb-4 text-lg">
+                Dive deeper into your unique traits like perfectionism,
+                resilience, and emotional intelligence. Unlock the premium
+                report to discover these hidden facets of your personality,
+                along with personalized insights for personal growth.
+              </p>
+              <div className="text-2xl font-bold text-orange-400 mb-6">
+                ₹299
+              </div>
+              <button
+                className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold px-8 py-4 rounded-full transition-colors flex items-center justify-center mb-4"
+                onClick={() => router.push("/payment")}
+              >
+                Unlock full results
+                <svg
+                  className="ml-2 w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
+                </svg>
+              </button>
+              <div className="text-gray-400 text-sm text-center">
+                30-day money-back guarantee if you are not satisfied.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

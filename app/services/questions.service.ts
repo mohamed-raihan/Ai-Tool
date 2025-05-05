@@ -352,12 +352,13 @@ export const questionsService = {
   async createQuestion(questionData: CreateQuestionDto): Promise<Question> {
     try {
       // Validate categories
-      const categories = questionData.category.split(",").map((c) => c.trim());
-      if (categories.length !== 2) {
-        throw new Error("Each question must have exactly two categories");
-      }
-
+      // const categories = questionData.category.split(",").map((c) => c.trim());
+      // if (categories.length !== 2) {
+      //   throw new Error("Each question must have exactly two categories");
+      // }
+      console.log(questionData);
       const response = await api.post("/api/question/", questionData);
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.error("Error creating question:", error);

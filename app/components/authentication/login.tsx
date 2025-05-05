@@ -51,7 +51,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(response.user));
 
         toast.success("Login successful!");
-        router.push("/user/dashboard/test");
+        router.push("/user/dashboard");
       }
     } catch (error) {
       if (error instanceof Error) {

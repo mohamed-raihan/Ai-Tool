@@ -118,8 +118,9 @@ export default function TestPage() {
         JSON.stringify(personalityResults)
       );
 
+      router.push("/user/dashboard/test/results");
       // Open signup modal instead of navigating to results
-      setIsModalOpen(true);
+      // setIsModalOpen(true);
     } catch (error) {
       console.error("Error calculating results:", error);
       toast.error("Failed to calculate test results");
@@ -146,24 +147,24 @@ export default function TestPage() {
     handleSubmit();
   };
 
-  const handleModalSubmit = async (data: {
-    name: string;
-    phone_number: string;
-    email: string;
-    password: string;
-  }) => {
-    try {
-      // Here you would typically make an API call to register the user
-      console.log("Signup data:", data);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+  // const handleModalSubmit = async (data: {
+  //   name: string;
+  //   phone_number: string;
+  //   email: string;
+  //   password: string;
+  // }) => {
+  //   try {
+  //     // Here you would typically make an API call to register the user
+  //     console.log("Signup data:", data);
+  //     // Simulate API call
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // After successful signup, navigate to results
-      router.push("/user/dashboard/test/results");
-    } catch (error) {
-      throw new Error("Failed to sign up. Please try again.");
-    }
-  };
+  //     // After successful signup, navigate to results
+  //     router.push("/user/dashboard/test/results");
+  //   } catch (error) {
+  //     throw new Error("Failed to sign up. Please try again.");
+  //   }
+  // };
 
   if (loading) {
     return (
@@ -317,11 +318,11 @@ export default function TestPage() {
         </div>
       </div>
 
-      <SignupModal
+      {/* <SignupModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleModalSubmit}
-      />
+      /> */}
     </div>
   );
 }
