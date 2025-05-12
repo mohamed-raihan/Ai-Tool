@@ -12,10 +12,10 @@ import {
   FiArrowLeft,
 } from "react-icons/fi";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
-import PsychometricReportPDF from "@/app/user/components/PsychometricReportPDF";
-import { findMatchingCareers } from "@/app/utils/careerMapping";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
+import { findMatchingCareers } from "@/app/utils/careerMapping";
+import PsychometricReportPDF from "../../components/PsychometricReportPDF";
 
 interface TestResult {
   aptitude_test: {
@@ -78,7 +78,10 @@ export default function UserResultsPage() {
   const fetchUser = async () => {
     try {
       const response = await api.get(API_URL.STUDENT.BASIC);
-      const matchedUser = response.data.find((user: any) => user.id == id);
+      const student = JSON.parse(localStorage.getItem("student") || "{}");
+      const matchedUser = response.data.find(
+        (user: any) => user.uuid == student.uuid
+      );
       setUser(matchedUser);
       if (matchedUser?.student_uuid) {
         fetchUserResults(matchedUser.student_uuid);
@@ -138,44 +141,7 @@ export default function UserResultsPage() {
         },
       ],
       scores: result.aptitude_test.scores,
-      personalityTraits: result.personality_test
-        ? {
-            type: result.personality_test.type,
-            description: result.personality_test.description,
-            traits: {
-              EI: {
-                primary: "Introversion",
-                secondary: "Extraversion",
-                score: result.personality_test.traits.EI.score,
-                color: "#10B981",
-              },
-              SN: {
-                primary: "Sensing",
-                secondary: "Intuition",
-                score: result.personality_test.traits.SN.score,
-                color: "#F59E0B",
-              },
-              TF: {
-                primary: "Feeling",
-                secondary: "Thinking",
-                score: result.personality_test.traits.TF.score,
-                color: "#3B82F6",
-              },
-              JP: {
-                primary: "Perceiving",
-                secondary: "Judging",
-                score: result.personality_test.traits.JP.score,
-                color: "#8B5CF6",
-              },
-              AT: {
-                primary: "Turbulent",
-                secondary: "Assertive",
-                score: result.personality_test.traits.AT.score,
-                color: "#EC4899",
-              },
-            },
-          }
-        : undefined,
+      personalityTraits: result.personality_test,
     };
   };
 

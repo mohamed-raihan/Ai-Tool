@@ -44,7 +44,7 @@ export default function AdminUsersPage() {
   return (
     <div className="h-[100vh] ">
       {/* <h1 className="text-2xl font-bold mb-4 text-white">All Users</h1> */}
-      <UsersTable users={students.length > 0 ? students : sampleUsers} />
+      <UsersTable getStudents={getStudents} users={students.length > 0 ? students : sampleUsers} />
     </div>
   );
 }

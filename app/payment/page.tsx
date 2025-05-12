@@ -5,6 +5,7 @@ import Script from "next/script"; // ✅ Add this
 import { API_URL } from "../services/api_url";
 import api from "../lib/axios";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const PaymentPage = () => {
   const [form, setForm] = useState({
@@ -17,6 +18,7 @@ const PaymentPage = () => {
     student_uuid: string;
     name: string;
     email: string;
+    phone: string;
   } | null>(null);
   const router = useRouter();
 
@@ -56,20 +58,22 @@ const PaymentPage = () => {
       const res = await api.post(API_URL.PAYMENT.CREATE_ORDER, {
         student_uuid: student.student_uuid,
         name: student.name,
-        email: student.email,
+        phone_number: student.phone,
         term_condition: true,
       });
 
       const order = res.data;
-
+      console.log(order);
+      
       const options: any = {
-        key: order.razorpay_key || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: order.razorpay_key || process.env.RAZORPAY_KEY_ID,
         amount: order.amount * 100, // ensure amount is in paisa
         currency: "INR",
         name: "Prepacademy",
         description: "Premium Personality Report",
         order_id: order.order_id,
         handler: async function (response: any) {
+          console.log(response);
           await api.post(API_URL.PAYMENT.VERIFY_ORDER, {
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_order_id: response.razorpay_order_id,
@@ -78,6 +82,7 @@ const PaymentPage = () => {
 
           // On success: set subscription flag and redirect
           sessionStorage.setItem("hasSubscription", "true");
+          toast.success("Payment successful");
           router.push("/user/dashboard/test/results");
         },
         prefill: {

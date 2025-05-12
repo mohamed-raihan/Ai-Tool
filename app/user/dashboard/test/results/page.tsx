@@ -43,6 +43,7 @@ const ResultsPage = () => {
   const [hasSubscription, setHasSubscription] = useState(false);
   const router = useRouter();
 
+  console.log(results?.scores);
   const matchingCareers = findMatchingCareers(results?.scores || []);
   console.log(matchingCareers);
 
@@ -629,7 +630,7 @@ const ResultsPage = () => {
                         <tr key={index} className="hover:bg-gray-700">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-100">
-                              {career.career}
+                              {career.name}
                             </div>
                           </td>
                           <td className="px-6 py-4">
@@ -639,7 +640,7 @@ const ResultsPage = () => {
                           </td>
                           <td className="px-6 py-4">
                             <ul className="list-disc list-inside text-sm text-gray-400">
-                              {career.education.map((edu, eduIndex) => (
+                              {career.education_pathway.map((edu, eduIndex) => (
                                 <li key={eduIndex}>{edu}</li>
                               ))}
                             </ul>
@@ -855,7 +856,7 @@ const ResultsPage = () => {
                 along with personalized insights for personal growth.
               </p>
               <div className="text-2xl font-bold text-orange-400 mb-6">
-                ₹299
+                
               </div>
               <button
                 className="bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold px-8 py-4 rounded-full transition-colors flex items-center justify-center mb-4"
@@ -876,9 +877,9 @@ const ResultsPage = () => {
                   />
                 </svg>
               </button>
-              <div className="text-gray-400 text-sm text-center">
+              {/* <div className="text-gray-400 text-sm text-center">
                 30-day money-back guarantee if you are not satisfied.
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

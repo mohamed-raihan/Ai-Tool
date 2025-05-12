@@ -19,6 +19,7 @@ export const API_URL = {
 
     STUDENT: {
         BASIC: '/api/student/',
+        DELETE_BASIC: (id: string) => `/api/student/${id}/`,
         EDUCATION: '/api/education/',
         PERSONAL: '/api/personal/',
     },
@@ -43,6 +44,10 @@ export const API_URL = {
     },
     CHATBOT: {
         GET_CHATBOT: '/api/ask/',
+    },
+    FIREBASE: {
+        PHONE_NUMBER: '/api/phone-number/',
+        DELETE_PHONE_NUMBER: (uid: string) => `/api/delete-number/${uid}/`,
     },
 
     

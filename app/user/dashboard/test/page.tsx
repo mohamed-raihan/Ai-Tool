@@ -82,9 +82,9 @@ export default function TestPage() {
 
     // Format questions for aptitude score calculation
     const aptitudeQuestions = questions
-      .filter((q) => parseInt(q.id) <= 12)
+      .filter((q) => parseInt(q.id.toString()) <= 30)
       .map((q) => ({
-        id: q.id,
+        id: q.id.toString(),
         category: q.category.name,
       }));
 
@@ -249,20 +249,20 @@ export default function TestPage() {
                       type="radio"
                       name={`answer-${question.id}`}
                       value="1"
-                      checked={answers[question.id] === "1"}
-                      onChange={() => handleAnswer(question.id, "1")}
+                      checked={answers[question.id.toString()] === "1"}
+                      onChange={() => handleAnswer(question.id.toString(), "1")}
                       className="hidden"
                     />
                     <span
                       className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-colors duration-200
                         ${
-                          answers[question.id] === "1"
+                          answers[question.id.toString()] === "1"
                             ? "border-green-400 bg-green-900/30"
                             : "border-gray-600 bg-gray-900"
                         }
                       `}
                     >
-                      {answers[question.id] === "1" && (
+                      {answers[question.id.toString()] === "1" && (
                         <span className="w-8 h-8 bg-green-400 rounded-full block"></span>
                       )}
                     </span>
@@ -276,20 +276,20 @@ export default function TestPage() {
                       type="radio"
                       name={`answer-${question.id}`}
                       value="0"
-                      checked={answers[question.id] === "0"}
-                      onChange={() => handleAnswer(question.id, "0")}
+                      checked={answers[question.id.toString()] === "0"}
+                      onChange={() => handleAnswer(question.id.toString(), "0")}
                       className="hidden"
                     />
                     <span
                       className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-colors duration-200
                         ${
-                          answers[question.id] === "0"
+                          answers[question.id.toString()] === "0"
                             ? "border-red-400 bg-red-900/30"
                             : "border-gray-600 bg-gray-900"
                         }
                       `}
                     >
-                      {answers[question.id] === "0" && (
+                      {answers[question.id.toString()] === "0" && (
                         <span className="w-8 h-8 bg-red-400 rounded-full block"></span>
                       )}
                     </span>

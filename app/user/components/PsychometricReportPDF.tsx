@@ -70,9 +70,11 @@ interface UserData {
 }
 
 interface CareerRecommendation {
-  career: string;
+  id: string;
+  name: string;
   description: string;
-  education: string[];
+  education_pathway: string[];
+  matchingScore: number;
 }
 
 // Optional: Add a Google font
@@ -475,10 +477,10 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
             {matchingCareers.map(
               (career: CareerRecommendation, index: number) => (
                 <View key={index} style={styles.tableRow}>
-                  <Text style={styles.tableCell}>{career.career}</Text>
+                  <Text style={styles.tableCell}>{career.name}</Text>
                   <Text style={styles.tableCell}>{career.description}</Text>
                   <Text style={styles.tableCell}>
-                    {career.education
+                    {career.education_pathway
                       .map((edu: string) => `• ${edu}`)
                       .join("\n")}
                   </Text>

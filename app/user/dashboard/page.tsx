@@ -9,6 +9,10 @@ import TestPage from "./test/page";
 import ProfileWizard from "./profile/page";
 import { SiChatbot } from "react-icons/si";
 import ChatBotPage from "./chatBot/page";
+import { PiExam } from "react-icons/pi";
+import PercentageCalculatorPage from "./percentage-calculator/page";
+import ProtectedRoute from "@/app/components/ProtectedRoute";
+import UserResultsPage from "./userResult/page";
 
 // Define types for our component
 type MenuItem = string;
@@ -78,8 +82,19 @@ const Dashboard: NextPage = () => {
     // router.push("/user/dashboard/chatbot");
   };
 
+  const handlePercentageNavigation = () => {
+    setActiveMenuItem("percentage");
+    // router.push("/user/dashboard/percentage-calculator");
+  };
+
+  const handleResultsNavigation = () => {
+    setActiveMenuItem("results");
+    // router.push("/user/dashboard/results");
+  };
+
   return (
-    <div className="flex h-screen bg-black text-white">
+    <ProtectedRoute>
+      <div className="flex h-screen bg-black text-white">
       {/* Sidebar */}
       <div className="w-16 flex flex-col items-center py-8 border-r border-gray-800 fixed h-screen">
         <div className="mb-8">
@@ -125,9 +140,9 @@ const Dashboard: NextPage = () => {
 
         <button
           className={`p-3 rounded-lg my-2 ${
-            activeMenuItem === "analytics" ? "bg-gray-800" : "hover:bg-gray-800"
+            activeMenuItem === "results" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
-          onClick={() => setActiveMenuItem("analytics")}
+          onClick={handleResultsNavigation}
         >
           <BarChart2 size={20} />
         </button>
@@ -142,12 +157,21 @@ const Dashboard: NextPage = () => {
         </button>
 
         <button
-          className={`p-3 rounded-lg ${
+          className={`p-3 rounded-lg my-2 ${
             activeMenuItem === "chatbot" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
           onClick={handleChatbotNavigation}
         >
           <SiChatbot size={20} />
+        </button>
+
+        <button
+          className={`p-3 rounded-lg my-2 ${
+            activeMenuItem === "percentage" ? "bg-gray-800" : "hover:bg-gray-800"
+          }`}
+          onClick={handlePercentageNavigation}
+        >
+          <PiExam size={20} />
         </button>
 
         <div className="mt-auto">
@@ -612,7 +636,20 @@ const Dashboard: NextPage = () => {
           <ChatBotPage />
         </div>
       )}
+
+      {activeMenuItem === "percentage" && (
+        <div className="w-full ml-16">
+          <PercentageCalculatorPage />
+        </div>
+      )}
+
+      {activeMenuItem === "results" && (
+        <div className="w-full ml-16">
+          <UserResultsPage />
+        </div>
+      )}
     </div>
+    </ProtectedRoute>
   );
 };
 

@@ -5,6 +5,7 @@ import { FiSend, FiMessageSquare } from "react-icons/fi";
 import { BsRobot } from "react-icons/bs";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
+import Image from "next/image";
 
 interface Message {
   id: string;
@@ -95,7 +96,7 @@ export default function ChatBotPage() {
                   <div
                     className={`max-w-[80%] rounded-2xl p-4 ${
                       message.sender === "user"
-                        ? "bg-orange-500 text-white rounded-br-none"
+                        ? "bg-[#F55D3E] text-white rounded-br-none"
                         : "bg-gray-700 text-gray-100 rounded-bl-none"
                     }`}
                   >
@@ -107,6 +108,15 @@ export default function ChatBotPage() {
                       })}
                     </span>
                   </div>
+                  {message.sender !== "user" && (
+                    <Image
+                      src="/prepMascot.png"
+                      className="ms-2 size-[90px]"
+                      alt="Chatbot Image"
+                      width={60}
+                      height={50}
+                    />
+                  )}
                 </div>
               ))
             )}

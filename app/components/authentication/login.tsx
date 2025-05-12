@@ -15,6 +15,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,6 +42,7 @@ export default function Login() {
         // localStorage.setItem("user", JSON.stringify(response.user));
 
         toast.success("Login successful!");
+        setIsLoggedIn(true);
         router.push("/admin/dashboard");
       } else {
         const response = await authService.login({ email, password });
@@ -51,6 +53,7 @@ export default function Login() {
         localStorage.setItem("user", JSON.stringify(response.user));
 
         toast.success("Login successful!");
+        setIsLoggedIn(true);
         router.push("/user/dashboard");
       }
     } catch (error) {

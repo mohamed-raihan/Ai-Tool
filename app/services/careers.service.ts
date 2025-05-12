@@ -7,6 +7,7 @@ export interface Career {
   education_pathway: string[];
   category: string;
   traits: string[];
+  score: string;
 }
 
 class CareerService {

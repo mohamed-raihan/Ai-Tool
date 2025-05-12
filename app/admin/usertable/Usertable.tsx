@@ -2,9 +2,14 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
+import api from "@/app/lib/axios";
+import { API_URL } from "@/app/services/api_url";
+import { toast } from "react-toastify";
 
 interface User {
   id: string;
+  student_uuid: string;
+  firebase_user_id: string;
   name: string;
   email: string;
   phone: string;
@@ -15,9 +20,10 @@ interface User {
 
 interface UsersTableProps {
   users: User[];
+  getStudents: () => Promise<any>;
 }
 
-export default function UsersTable({ users }: UsersTableProps) {
+export default function UsersTable({ users, getStudents }: UsersTableProps) {
   const router = useRouter();
 
   console.log(users);
@@ -28,6 +34,19 @@ export default function UsersTable({ users }: UsersTableProps) {
 
   const handleResultsClick = (userId: string) => {
     router.push(`/admin/usertable/${userId}/results`);
+  };
+
+  const handleDelete = async (student_uuid: string, firebase_user_id: string) => {
+    try {
+      // const firbaseres = await api.delete(API_URL.FIREBASE.DELETE_PHONE_NUMBER(firebase_user_id));
+      const response = await api.delete(API_URL.STUDENT.DELETE_BASIC(student_uuid));
+      console.log(response);
+      getStudents();
+      toast.success("User deleted successfully",);
+    } catch (error) {
+      console.log(error);
+      toast.error("User deletion failed");
+    }
   };
 
   return (
@@ -45,52 +64,52 @@ export default function UsersTable({ users }: UsersTableProps) {
           </div>
         </div>
 
-        <div className="bg-gray-800 rounded-lg overflow-hidden shadow-xl">
-          <div className="overflow-x-auto">
+        <div className="bg-gray-800 rounded-lg shadow-xl">
+          <div className="h-[70vh] overflow-auto">
             <div className="inline-block min-w-full">
               <div className="overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-700">
-                  <thead className="bg-gray-700/50">
+                  <thead className="bg-gray-700/50 sticky top-0 z-10">
                     <tr>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Name
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Email
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Phone
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Class
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-left text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Stream
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-right text-xs font-medium text-gray-300 uppercase tracking-wider"
+                        className="px-6 py-4 text-right text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-700 bg-gray-800">
+                  <tbody className="divide-y divide-gray-700 bg-gray-800 overflow-y-auto">
                     {users.map((user, index) => (
                       <tr
                         key={user.id}
@@ -149,6 +168,12 @@ export default function UsersTable({ users }: UsersTableProps) {
                               className="text-blue-500 hover:text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg transition-colors"
                             >
                               View Results
+                            </button>
+                            <button
+                              onClick={() => handleDelete(user.student_uuid,user.firebase_user_id)}
+                              className="text-red-500 hover:text-red-400 bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
+                            >
+                              Delete
                             </button>
                           </div>
                         </td>

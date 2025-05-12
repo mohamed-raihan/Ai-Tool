@@ -1,125 +1,293 @@
+import api from "../lib/axios";
+import { API_URL } from "../services/api_url";
+import { careerService } from "../services/careers.service";
+
 interface CareerPath {
-  career: string;
+  id: string;
+  name: string;
   description: string;
-  education: string[];
+  education_pathway: string[];
   traits: string[];
-  minimumScore: number;
+  score: string;
 }
 
 export const careerPaths: CareerPath[] = [
   {
-    career: "Software Engineer",
+    id: "1",
+    name: "Software Engineer",
     description:
       "Develops software applications and systems, solving complex technical problems through coding and algorithmic thinking",
-    education: [
+    education_pathway: [
       "Bachelor's in Computer Science",
       "Bachelor's in Software Engineering",
       "Relevant coding bootcamps with strong portfolio",
     ],
     traits: ["Artistic", "Logical", "Problem Solving", "Technical"],
-    minimumScore: 70,
+    score: "70",
   },
   {
-    career: "Clinical Psychologist",
+    id: "2",
+    name: "Clinical Psychologist",
     description:
       "Assesses and treats mental, emotional, and behavioral disorders through observation, testing, and psychotherapy",
-    education: [
+    education_pathway: [
       "Bachelor's in Psychology",
       "Master's in Clinical Psychology",
       "Doctorate in Psychology (Ph.D. or Psy.D.)",
     ],
     traits: ["Social", "Emotional Intelligence", "Analytical", "Communication"],
-    minimumScore: 75,
+    score: "75",
   },
   {
-    career: "UX/UI Designer",
+    id: "3",
+    name: "Entrepreneur",
     description:
-      "Creates user-friendly digital interfaces by combining artistic skills with user behavior analysis",
-    education: [
-      "Bachelor's in Design",
-      "Bachelor's in Human-Computer Interaction",
-      "UX Design Certification Programs",
+      "Starts and manages new business ventures, taking financial risks to innovate, lead teams, and drive growth in competitive markets.",
+    education_pathway: [
+      "Bachelor's in Business Administration or Entrepreneurship",
+      "Startup Incubator or Accelerator Programs",
+      "Practical experience and market research",
     ],
-    traits: ["Creative", "Visual", "Problem Solving", "Communication"],
-    minimumScore: 70,
+    traits: ["Enterprising", "Strategic", "Leadership", "Risk-Taking"],
+    score: "80",
   },
   {
-    career: "Data Scientist",
+    id: "4",
+    name: "Data Scientist",
     description:
       "Analyzes complex data sets to help organizations make informed decisions through statistical analysis and machine learning",
-    education: [
+    education_pathway: [
       "Bachelor's in Statistics",
       "Master's in Data Science",
       "Bachelor's in Mathematics with Data Science specialization",
     ],
     traits: ["Analytical", "Mathematical", "Technical", "Problem Solving"],
-    minimumScore: 75,
+    score: "75",
   },
   {
-    career: "Marketing Manager",
+    id: "5",
+    name: "Marketing Manager",
     description:
       "Develops and implements marketing strategies to promote products or services and increase brand awareness",
-    education: [
+    education_pathway: [
       "Bachelor's in Marketing",
       "Bachelor's in Business Administration",
       "Digital Marketing Certification Programs",
     ],
     traits: ["Creative", "Communication", "Strategic", "Social"],
-    minimumScore: 70,
+    score: "70",
   },
   {
-    career: "Environmental Scientist",
+    id: "6",
+    name: "Environmental Scientist",
     description:
       "Studies environmental problems and develops solutions to protect human health and nature",
-    education: [
+    education_pathway: [
       "Bachelor's in Environmental Science",
       "Master's in Environmental Studies",
       "Bachelor's in Earth Sciences",
     ],
     traits: ["Analytical", "Research", "Nature-Oriented", "Problem Solving"],
-    minimumScore: 70,
+    score: "70",
   },
   {
-    career: "Financial Analyst",
+    id: "7",
+    name: "Financial Analyst",
     description:
       "Evaluates financial data to guide business decisions and investment strategies",
-    education: [
+    education_pathway: [
       "Bachelor's in Finance",
       "Bachelor's in Economics",
       "CFA Certification",
     ],
     traits: ["Analytical", "Mathematical", "Strategic", "Detail-Oriented"],
-    minimumScore: 75,
+    score: "75",
   },
   {
-    career: "Teacher",
+    id: "8",
+    name: "Teacher",
     description:
       "Educates students and facilitates learning through various teaching methods and curriculum development",
-    education: [
+    education_pathway: [
       "Bachelor's in Education",
       "Teaching Certification",
       "Master's in Education",
     ],
     traits: ["Communication", "Social", "Patient", "Organized"],
-    minimumScore: 70,
+    score: "70",
   },
+  {
+    id: "9",
+    name: "Civil Engineer",
+    description:
+      "Designs, constructs, and maintains infrastructure projects such as roads, bridges, and buildings, ensuring safety and functionality.",
+    education_pathway: [
+      "Bachelor's in Civil Engineering",
+      "Master's in Structural or Environmental Engineering",
+      "Certification in Project Management or AutoCAD tools",
+    ],
+    traits: ["Technical", "Realistic", "Problem Solving", "Organized"],
+    score: "70",
+  },
+  {
+    id: "10",
+    name: "Human Resources Manager",
+    description:
+      "Oversees recruitment, employee relations, and organizational development while ensuring a productive and healthy work environment.",
+    education_pathway: [
+      "Bachelor's in Human Resource Management",
+      "MBA in HR or Organizational Psychology",
+      "Certification in Industrial Relations or Labor Law",
+    ],
+    traits: ["Communication", "Social", "Emotional Intelligence", "Organized"],
+    score: "70",
+  },
+  {
+    id: "11",
+    name: "Film Director",
+    description:
+      "Leads the creative and technical aspects of film production, turning scripts into compelling visual stories through artistic direction.",
+    education_pathway: [
+      "Bachelor's in Film Studies or Media Arts",
+      "Workshops or Internships in Cinematography",
+      "Experience in screenwriting, editing, or theater",
+    ],
+    traits: ["Creative", "Artistic", "Strategic", "Visual"],
+    score: "75",
+  },
+  {
+    id: "12",
+    name: "Biomedical Scientist",
+    description:
+      "Conducts research and laboratory tests to improve medical treatments and understand diseases at a molecular level.",
+    education_pathway: [
+      "Bachelor's in Biomedical Science",
+      "Master's or Ph.D. in Biomedical Research",
+      "Lab Certifications or Clinical Training",
+    ],
+    traits: ["Investigative", "Analytical", "Detail-Oriented", "Technical"],
+    score: "75",
+  },
+  {
+    id: "13",
+    name: "Full-Stack Developer",
+    description:
+      "Builds both the front-end and back-end of web applications, integrating user interfaces with server-side logic and databases.",
+    education_pathway: [
+      "Bachelor's in Computer Science or Software Engineering",
+      "Full-Stack Web Development Bootcamp",
+      "Self-learning with projects and GitHub portfolio",
+    ],
+    traits: ["Technical", "Problem Solving", "Logical", "Creative"],
+    score: "75",
+  },
+  {
+    id: "14",
+    name: "Chartered Accountant",
+    description:
+      "Manages financial records, audits, tax planning, and business advisory for individuals or corporations.",
+    education_pathway: [
+      "Bachelor's in Commerce or Accounting",
+      "CA Course (ICAI, ACCA, or equivalent)",
+      "Internship with auditing firm",
+    ],
+    traits: ["Analytical", "Detail-Oriented", "Mathematical", "Strategic"],
+    score: "80",
+  },
+  {
+    id: "15",
+    name: "Digital Marketer",
+    description:
+      "Plans and executes online marketing campaigns to grow brand awareness and drive user engagement across digital platforms.",
+    education_pathway: [
+      "Bachelor's in Marketing, Mass Communication, or Business",
+      "Certification in Digital Marketing (Google, HubSpot, Meta)",
+      "Hands-on experience with SEO, SEM, and Social Media Ads",
+    ],
+    traits: ["Creative", "Communication", "Strategic", "Social"],
+    score: "70",
+  },
+  {
+    id: "16",
+    name: "Lawyer",
+    description:
+      "Represents and advises clients on legal issues, drafts documents, and presents cases in court or legal negotiations.",
+    education_pathway: [
+      "Bachelor's in Law (LLB)",
+      "Master's in Law (LLM) (Optional)",
+      "Bar Examination and License to Practice",
+    ],
+    traits: ["Analytical", "Communication", "Detail-Oriented", "Strategic"],
+    score: "75",
+  },
+  {
+    id: "17",
+    name: "Nurse Practitioner",
+    description:
+      "Provides advanced healthcare services, including diagnosis and treatment, often acting as a primary care provider.",
+    education_pathway: [
+      "Bachelor of Science in Nursing (BSN)",
+      "Master’s in Nursing (MSN) or DNP",
+      "State Licensure and Clinical Training",
+    ],
+    traits: ["Organized", "Patient", "Problem Solving", "Social"],
+    score: "75",
+  },
+  {
+    id: "18",
+    name: "Business Development Manager",
+    description:
+      "Identifies growth opportunities, builds strategic partnerships, and drives revenue by expanding customer base or market presence.",
+    education_pathway: [
+      "Bachelor's in Business Administration, Marketing, or Management",
+      "MBA (Preferred)",
+      "Courses in Sales, CRM, and Negotiation Skills",
+    ],
+    traits: ["Enterprising", "Communication", "Strategic", "Persuasive"],
+    score: "75",
+  }
 ];
+
+let careerPathsData: CareerPath[] = careerPaths;
+
+const fetchCareerPaths = async () => {
+  try {
+    const res = await careerService.getCareers();
+    console.log(res);
+    if (res && res.length > 0) {
+      careerPathsData = res.map((career: any) => ({
+        id: career.id,
+        name: career.name,
+        description: career.description,
+        education_pathway: career.education_pathway,
+        traits: career.traits,
+        score: career.score || "70",
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching career paths:", error);
+  }
+};
+
+// Fetch career paths on module load
+// fetchCareerPaths();
 
 export function findMatchingCareers(
   scores: Array<{ category: string; score: number }>
 ) {
   console.log("Input scores:", scores);
+  console.log("Career paths data:", careerPathsData);
 
-  const matchingCareers = careerPaths.filter((career) => {
+  const matchingCareers = careerPathsData.filter((career) => {
     // Check if the candidate's traits match the career requirements
     const matchingTraits = career.traits.filter((trait) =>
       scores.some((score) => {
         const matches =
           score.category.toLowerCase().includes(trait.toLowerCase()) &&
-          score.score >= career.minimumScore; 
-        console.log(
-          `Trait: ${trait}, Score: ${score.category}, Matches: ${matches}`
-        );
+          score.score >= parseInt(career.score);
+        // console.log(
+        //   `Trait: ${trait}, Score: ${score.category}, Matches: ${matches}`
+        // );
         return matches;
       })
     );
@@ -127,16 +295,19 @@ export function findMatchingCareers(
     console.log(matchingTraits);
 
     console.log(
-      `Career: ${career.career}, Matching traits: ${matchingTraits.length}`
+      `Career: ${career.name}, Matching traits: ${matchingTraits.length}`
     );
-    return matchingTraits.length >= 2;
+    return matchingTraits.length >= 1;
   });
+
+  console.log(matchingCareers);
 
   const results = matchingCareers
     .map((career) => ({
-      career: career.career,
+      id: career.id,
+      name: career.name,
       description: career.description,
-      education: career.education,
+      education_pathway: career.education_pathway,
       matchingScore: calculateMatchingScore(scores, career.traits),
     }))
     .sort((a, b) => b.matchingScore - a.matchingScore);
@@ -149,6 +320,8 @@ function calculateMatchingScore(
   scores: Array<{ category: string; score: number }>,
   requiredTraits: string[]
 ): number {
+  console.log(scores);
+
   let totalScore = 0;
   let matchCount = 0;
 
@@ -181,11 +354,11 @@ export function generateStudentSummary(
       description: getTraitDescription(trait.category),
     })),
     careerMatches: matchingCareers.slice(0, 3).map((career) => ({
-      career: career.career,
+      career: career.name,
       matchScore: career.matchingScore,
       keyTraits:
         careerPaths
-          .find((c) => c.career === career.career)
+          .find((c) => c.name === career.name)
           ?.traits.filter((trait) =>
             scores.some(
               (score) =>
@@ -226,10 +399,11 @@ function getTraitDescription(trait: string): string {
 function generateRecommendations(
   topTraits: Array<{ category: string; score: number }>,
   matchingCareers: Array<{
-    career: string;
+    id: string;
+    name: string;
     matchingScore: number;
     description: string;
-    education: string[];
+    education_pathway: string[];
   }>
 ): string[] {
   const recommendations: string[] = [];
@@ -237,7 +411,7 @@ function generateRecommendations(
   // Career development recommendations
   if (matchingCareers.length > 0) {
     recommendations.push(
-      `Based on your strengths, you would excel in ${matchingCareers[0].career} or similar roles. Consider exploring ${matchingCareers[0].education[0]} as a potential educational path.`
+      `Based on your strengths, you would excel in ${matchingCareers[0].name} or similar roles. Consider exploring ${matchingCareers[0].education_pathway[0]} as a potential educational path.`
     );
   }
 
@@ -270,14 +444,15 @@ export function generateConciseSummary(
     .slice(0, 3);
 
   const topCareer = matchingCareers[0];
-  const educationPath = topCareer?.education[0] || "relevant field of study";
+  const educationPath =
+    topCareer?.education_pathway[0] || "relevant field of study";
 
   const traitDescriptions = topTraits
     .map((trait) => `${trait.category.toLowerCase()} (${trait.score}%)`)
     .join(", ");
 
   return `Based on your assessment, you demonstrate strong ${traitDescriptions} abilities. Your profile aligns well with a career in ${
-    topCareer?.career || "a technical field"
+    topCareer?.name || "a technical field"
   }, where you can leverage your ${
     topTraits[0]?.category.toLowerCase() || "analytical"
   } skills. Consider pursuing ${educationPath} to build upon your natural strengths. Your combination of traits suggests you would excel in roles requiring ${

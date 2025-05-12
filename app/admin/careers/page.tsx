@@ -13,6 +13,7 @@ const defaultCareer: Career = {
   education_pathway: [],
   category: "",
   traits: [],
+  score: "",
 };
 
 interface Category {
@@ -105,13 +106,13 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-gray-900 p-8 overflow-y-auto ">
       <div className="max-w-8xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-100 mb-8">
+        <h1 className="text-3xl font-bold text-gray-100 mb-4">
           Manage Careers
         </h1>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {/* Add/Edit Form */}
-          <div className="bg-gray-800 h-fit col-span-2 p-6 rounded-lg mb-8">
+          <div className="bg-gray-800 h-fit col-span-1 p-6 rounded-lg mb-8">
             <h2 className="text-xl font-semibold text-gray-100 mb-4">
               {selectedCareer ? "Edit Career" : "Add New Career"}
             </h2>
@@ -158,24 +159,6 @@ export default function CareersPage() {
                 />
               </div>
               <div>
-                <label className="block text-gray-300 mb-2">Category ID</label>
-                <select
-                  value={formData.category}
-                  onChange={(e) =>
-                    setFormData({ ...formData, category: e.target.value })
-                  }
-                  className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
                 <label className="block text-gray-300 mb-2">Traits</label>
                 <input
                   type="text"
@@ -190,6 +173,42 @@ export default function CareersPage() {
                   className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Category ID
+                  </label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) =>
+                      setFormData({ ...formData, category: e.target.value })
+                    }
+                    className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-300 mb-2">
+                    Minimum Score
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.score}
+                    onChange={(e) =>
+                      setFormData({ ...formData, score: e.target.value })
+                    }
+                    className="w-full bg-gray-700 text-gray-100 border border-gray-600 rounded-md p-2 focus:outline-none focus:border-orange-500"
+                  />
+                </div>
+              </div>
+
               <div className="flex space-x-4">
                 <button
                   type="submit"
@@ -258,6 +277,10 @@ export default function CareersPage() {
                       <span className="font-medium">Category:</span>{" "}
                       <span className="text-orange-400">{career.category}</span>
                     </div> */}
+                    <div className="flex gap-1">
+                      <span className="font-medium">Minimun score:</span>
+                      <span className="text-orange-400">{career.score}</span>
+                    </div>
                     <div className="flex gap-1">
                       <span className="font-medium mt-2">Education:</span>
                       <div className="flex flex-wrap gap-1 mt-1">

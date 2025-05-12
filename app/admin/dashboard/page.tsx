@@ -1,6 +1,6 @@
 // pages/dashboard.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Home, BarChart2, FileText, Users, FilePlus } from "lucide-react";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
@@ -15,58 +15,63 @@ import { BiCategory } from "react-icons/bi";
 import CategoryManagement from "../category/page";
 import { RiMoneyRupeeCircleLine } from "react-icons/ri";
 import PaymentManagement from "../payment/page";
+import api from "@/app/lib/axios";
+import { API_URL } from "@/app/services/api_url";
+import { TbReport } from "react-icons/tb";
+import ReportPage from "../report/page";
 
 // Define types for our component
 type MenuItem = string;
 
-interface EmployeeData {
+interface StudentData {
   name: string;
   avatarColor: string;
-  contract: number;
-  client: number;
-  intern: number;
-  sickLeave: string;
-  unsubmitted: number;
-  overtime: string | number;
+  Email: string;
+  Phone: string;
+  Class: string;
+  Stream: string;
+  created_at?: string;
 }
 
 const Dashboard: NextPage = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("home");
   const router = useRouter();
+  const [students, setStudents] = useState<any[]>([]);
 
-  // Sample employee data
-  const employeeData: EmployeeData[] = [
-    {
-      name: "Leon Nils",
-      avatarColor: "bg-red-500",
-      contract: 432,
-      client: 29,
-      intern: 78,
-      sickLeave: "0/5",
-      unsubmitted: 23,
-      overtime: "-",
-    },
-    {
-      name: "Friedrich Beren",
-      avatarColor: "bg-amber-500",
-      contract: 589,
-      client: 189,
-      intern: 48,
-      sickLeave: "2/1",
-      unsubmitted: 12,
-      overtime: 1.5,
-    },
-    {
-      name: "Bruno Soares",
-      avatarColor: "bg-gray-400",
-      contract: 298,
-      client: 489,
-      intern: 109,
-      sickLeave: "8/12",
-      unsubmitted: 8,
-      overtime: "-",
-    },
-  ];
+  const fetchStudents = async () => {
+    try {
+      const respons = await api.get(API_URL.STUDENT.BASIC);
+      setStudents(respons.data);
+      console.log(respons);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  // Sample student data
+  const studentData: StudentData[] = students.map((student) => ({
+    name: student.name,
+    avatarColor: "bg-red-500",
+    Email: student.email,
+    Phone: student.phone,
+    Class: student.class_name.name,
+    Stream: student.stream_name.name,
+    created_at: student.created_at,
+  }));
+
+  // Get the latest 10 students by login (created_at)
+  const loginData = [...studentData]
+    .filter((s) => !!s.created_at)
+    .sort(
+      (a, b) =>
+        new Date(b.created_at as string).getTime() -
+        new Date(a.created_at as string).getTime()
+    )
+    .slice(0, 10);
 
   const handleTestNavigation = () => {
     setActiveMenuItem("test");
@@ -95,6 +100,11 @@ const Dashboard: NextPage = () => {
 
   const handlepaymentNavigation = () => {
     setActiveMenuItem("payment");
+    // router.push("/admin/usertable");
+  };
+
+  const handlereportNavigation = () => {
+    setActiveMenuItem("report");
     // router.push("/admin/usertable");
   };
 
@@ -134,23 +144,23 @@ const Dashboard: NextPage = () => {
           <Home size={20} />
         </button>
 
-        <button
+        {/* <button
           className={`p-3 rounded-lg mb-2 ${
             activeMenuItem === "analytics" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
           onClick={() => setActiveMenuItem("analytics")}
         >
           <BarChart2 size={20} />
-        </button>
+        </button> */}
 
-        <button
+        {/* <button
           className={`p-3 rounded-lg ${
             activeMenuItem === "test" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
           onClick={handleTestNavigation}
         >
           <FileText size={20} />
-        </button>
+        </button> */}
 
         <button
           className={`p-3 rounded-lg my-2 ${
@@ -191,7 +201,7 @@ const Dashboard: NextPage = () => {
         </button>
 
         <button
-          className={`p-3 rounded-lg ${
+          className={`p-3 rounded-lg mb-2 ${
             activeMenuItem === "payment" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
           onClick={handlepaymentNavigation}
@@ -200,21 +210,14 @@ const Dashboard: NextPage = () => {
           {/* <FilePlus size={20} /> */}
         </button>
 
-        <div className="mt-auto">
-          <button className="p-3 rounded-lg hover:bg-gray-800">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="12" cy="12" r="8" stroke="white" strokeWidth="2" />
-              <path d="M12 8V16" stroke="white" strokeWidth="2" />
-              <path d="M8 12H16" stroke="white" strokeWidth="2" />
-            </svg>
-          </button>
-        </div>
+        <button
+          className={`p-3 rounded-lg ${
+            activeMenuItem === "report" ? "bg-gray-800" : "hover:bg-gray-800"
+          }`}
+          onClick={handlereportNavigation}
+        >
+          <TbReport size={20} />
+        </button>
       </div>
 
       {/* Main Content */}
@@ -271,374 +274,118 @@ const Dashboard: NextPage = () => {
                   />
                 </svg>
               </button>
-              <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center">
-                <span className="text-sm font-medium">JS</span>
+              <div className="w-14 h-8 rounded-full bg-amber-500 flex items-center justify-center">
+                <span className="text-sm font-bold">Admin</span>
               </div>
             </div>
           </header>
 
           {/* Dashboard Content */}
           <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Check Section */}
-            <div className="bg-gray-50 text-black rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-medium">Check</h2>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-32 bg-green-400 rounded-full"></div>
-                  <span className="text-xs text-gray-500">100% complete</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="bg-amber-200 p-3 rounded-md flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-amber-300 p-1 rounded-md">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M5 12L10 17L19 8"
-                          stroke="black"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span>2 Missing invoices</span>
-                  </div>
-                </div>
-
-                <div className="bg-amber-200 p-3 rounded-md flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-amber-300 p-1 rounded-md">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M5 12L10 17L19 8"
-                          stroke="black"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span>9 missing hours in time sheets</span>
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center text-xs">
-                    JS
-                  </div>
-                </div>
-
-                <div className="bg-amber-200 p-3 rounded-md flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-amber-300 p-1 rounded-md">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M5 12L10 17L19 8"
-                          stroke="black"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </div>
-                    <span>Unreconciled Accounts Receivable</span>
-                  </div>
-                  <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center text-xs">
-                    JS
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Report Section */}
-            <div className="bg-orange-400 rounded-lg p-4">
-              <h2 className="font-medium text-white mb-4">Report</h2>
-
-              <div className="space-y-2">
-                <div className="bg-orange-200 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="text-black font-medium">Report, 15 Oct</div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                        in progress
-                      </span>
-                      <button>
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M9 18L15 12L9 6"
-                            stroke="black"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center text-xs">
-                      JS
-                    </div>
-                    <span>Shared with CFO</span>
-                  </div>
-                </div>
-
-                <div className="bg-orange-200 p-3 rounded-md">
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="text-black font-medium">Report, 10 Sep</div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">
-                        Realistic
-                      </span>
-                      <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
-                        Complete
-                      </span>
-                      <button>
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M9 18L15 12L9 6"
-                            stroke="black"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-gray-400 flex items-center justify-center text-xs">
-                      JS
-                    </div>
-                    <span>Shared with Investors</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Understand Section */}
-            <div className="bg-gray-900 rounded-lg p-4">
+            <div className="bg-gray-800/50 backdrop-blur-sm col rounded-lg p-4 border border-gray-700/50">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="font-medium">Understand</h2>
+                <h2 className="font-medium text-white text-lg">Understand</h2>
                 <div className="text-xs text-gray-400">Time Entry Week</div>
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="bg-orange-400 rounded-md p-3 text-center">
-                  <div className="text-xl font-semibold">3,458</div>
-                  <div className="text-xs">Contract Hours</div>
+                <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-md p-3 text-center shadow-lg">
+                  <div className="text-xl font-semibold">{students.length}</div>
+                  <div className="text-xs">Total Students</div>
                 </div>
 
-                <div className="bg-orange-300 rounded-md p-3 text-center">
+                <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-md p-3 text-center shadow-lg">
                   <div className="text-xl font-semibold">1,059</div>
-                  <div className="text-xs">Client Hours</div>
+                  <div className="text-xs">Subscribed Students</div>
                 </div>
 
-                <div className="bg-amber-200 text-black rounded-md p-3 text-center">
-                  <div className="text-xl font-semibold">30.62%</div>
-                  <div className="text-xs">Utilization</div>
-                </div>
-              </div>
-
-              <div className="flex justify-between items-center mb-4 text-sm">
-                <div className="flex items-center gap-1">
-                  <span>Last 12 week</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <span>Specific week</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <span>Active employee</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-
-                <div className="flex items-center gap-1">
-                  <span>Employee</span>
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M6 9L12 15L18 9"
-                      stroke="white"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                <div className="bg-gradient-to-br from-orange-300 to-orange-400 rounded-md p-3 text-center shadow-lg">
+                  <div className="text-xl font-semibold">{students.length}</div>
+                  <div className="text-xs">No of test taken</div>
                 </div>
               </div>
 
-              <div className="text-xs text-gray-400 grid grid-cols-7 gap-2 mb-2">
-                <div>Employee</div>
-                <div>Contract</div>
-                <div>Client</div>
-                <div>Intern</div>
-                <div>Sick/Leave</div>
-                <div>Unsubmitted</div>
-                <div>Overtime</div>
-              </div>
-
-              <div className="space-y-2 text-sm">
-                {employeeData.map((employee, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-7 gap-2 items-center"
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`w-6 h-6 rounded-full ${employee.avatarColor}`}
-                      ></div>
-                      <span>{employee.name}</span>
-                    </div>
-                    <div>{employee.contract}</div>
-                    <div>{employee.client}</div>
-                    <div>{employee.intern}</div>
-                    <div>{employee.sickLeave}</div>
-                    <div>{employee.unsubmitted}</div>
-                    <div>{employee.overtime}</div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-700/50">
+                  <thead>
+                    <tr className="text-xs text-gray-400 bg-gray-900/50">
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Email</th>
+                      <th className="px-4 py-2 text-left">Phone</th>
+                      <th className="px-4 py-2 text-left">Class</th>
+                      <th className="px-4 py-2 text-left">Stream</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-700/50">
+                    {studentData.map((student, index) => (
+                      <tr
+                        key={index}
+                        className="text-sm hover:bg-gray-700/50 transition-colors"
+                      >
+                        <td className="px-4 py-2">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium">
+                              {student.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span>{student.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-4 py-2">{student.Email}</td>
+                        <td className="px-4 py-2">{student.Phone}</td>
+                        <td className="px-4 py-2">{student.Class}</td>
+                        <td className="px-4 py-2">{student.Stream}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            {/* Plan Section */}
-            <div className="bg-amber-100 text-black rounded-lg p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-medium">Plan</h2>
-                <div className="flex items-center gap-2">
-                  <button className="bg-white px-3 py-1 rounded-md text-sm font-medium">
-                    Optimistic
-                  </button>
-                  <button className="px-3 py-1 rounded-md text-sm font-medium text-gray-600">
-                    Realistic
-                  </button>
-                  <button className="px-3 py-1 rounded-md text-sm font-medium text-gray-600">
-                    Analyze
-                  </button>
-                </div>
-              </div>
+            {/* Report Section */}
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700/50">
+              <h2 className="font-medium text-white text-lg mb-4">
+                Recent Login
+              </h2>
 
-              <div className="h-64 relative">
-                {/* This is a simplified representation of the chart */}
-                <div className="absolute inset-0 flex items-end justify-between">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((month) => (
-                    <div
-                      key={month}
-                      className="h-1/3 w-6 bg-white rounded-t-md"
-                      style={{
-                        height: `${Math.floor(Math.random() * 70) + 10}%`,
-                      }}
-                    ></div>
-                  ))}
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-600 pt-2 border-t border-gray-300">
-                  {[
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ].map((month, index) => (
-                    <div key={index}>{month}</div>
-                  ))}
-                </div>
-
-                <div className="absolute top-1/2 -translate-y-1/2 right-1/3 w-2 h-32 bg-black rounded-full"></div>
-
-                <div className="absolute top-0 left-0 h-full flex flex-col justify-between text-xs text-gray-600">
-                  <div>450K €</div>
-                  <div>300K €</div>
-                  <div>150K €</div>
-                  <div>0 €</div>
-                  <div>-150K €</div>
-                </div>
+              <div className="space-y-2">
+                {studentData.map((student, index) => (
+                  <div className="bg-gray-800/50 backdrop-blur-sm p-3 rounded-md border border-gray-700/50 hover:bg-gray-700/50 transition-colors">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="text-white font-medium">
+                        {student.name}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
+                          in progress
+                        </span>
+                        <button>
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M9 18L15 12L9 6"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xs text-white">
+                        {student.name.charAt(0)}
+                      </div>
+                      <span>Logged in at {student.created_at}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -678,6 +425,12 @@ const Dashboard: NextPage = () => {
       {activeMenuItem === "payment" && (
         <div className="w-full">
           <PaymentManagement />
+        </div>
+      )}
+
+      {activeMenuItem === "report" && (
+        <div className="w-full">
+          <ReportPage />
         </div>
       )}
     </div>

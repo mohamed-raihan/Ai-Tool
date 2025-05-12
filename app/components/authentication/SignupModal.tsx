@@ -2,10 +2,23 @@
 
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  PhoneAuthProvider,
+  signInWithCredential,
+} from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import { FiX, FiUser, FiPhone, FiMail, FiLock } from "react-icons/fi";
+import {
+  initializeRecaptcha,
+  sendOTP,
+  verifyOTP,
+} from "../firebase/firebaseApp";
+import { toast } from "react-toastify";
+import { setAuth } from "@/app/lib/auth";
 
 interface SignupModalProps {
   isOpen: boolean;
@@ -37,10 +50,11 @@ export default function SignupModal({
     password: "",
     gender: "Male",
     dob: "",
-    address: "",
+    address: "address",
     role: "student",
     class_id: "",
     stream_id: "",
+    firebase_user_id: "",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,6 +62,12 @@ export default function SignupModal({
   const [classes, setClasses] = useState([]);
   const [streams, setStreams] = useState([]);
   const [filteredStreams, setFilteredStreams] = useState([]);
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
 
   useEffect(() => {
     fetchClasses();
@@ -79,6 +99,105 @@ export default function SignupModal({
     }
   };
 
+  //firebase auth
+  const handleSendOTP = async () => {
+    if (!formData.phone) {
+      setError("Please enter a mobile number");
+      return;
+    }
+
+    const firebaseRes = await api.post(API_URL.FIREBASE.PHONE_NUMBER, {
+      phone_number: formData.phone.startsWith("+91")
+        ? formData.phone
+        : `+91${formData.phone.replace(/^0+/, "")}`,
+    });
+    setFormData((prev) => ({
+      ...prev,
+      firebase_user_id: firebaseRes.data.uid,
+    }));
+
+    const mobilePattern = /^(\+91|91)?[6-9]\d{9}$/;
+    let mobileToCheck = formData.phone;
+
+    if (mobileToCheck.startsWith("+91")) {
+      mobileToCheck = mobileToCheck.substring(3);
+    } else if (mobileToCheck.startsWith("91")) {
+      mobileToCheck = mobileToCheck.substring(2);
+    }
+
+    if (
+      !mobilePattern.test("+91" + mobileToCheck.replace(/\D/g, "").slice(-10))
+    ) {
+      setError("Please enter a valid Indian mobile number");
+      return;
+    }
+
+    setIsVerifying(true);
+    setError(null);
+
+    try {
+      // Initialize reCAPTCHA
+      await initializeRecaptcha("recaptcha-container");
+
+      // Format phone number properly
+      const phoneNumber = formData.phone.startsWith("+91")
+        ? formData.phone
+        : `+91${formData.phone.replace(/^0+/, "")}`;
+
+      // Send OTP via Firebase
+      const result = await sendOTP(phoneNumber);
+
+      if (result.success) {
+        setOtpSent(true);
+        toast.success("OTP sent successfully to your mobile!");
+      } else {
+        setError(result.error || "Failed to send OTP");
+      }
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      setError("Failed to send OTP. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (otp.length < 6) {
+      setError("Please enter a valid 6-digit OTP");
+      return;
+    }
+
+    try {
+      setIsVerifying(true);
+      setError(null);
+
+      // Verify OTP with Firebase
+      const result = await verifyOTP(otp);
+      console.log(result);
+
+      if (result.success) {
+        setPhoneVerified(true);
+
+        // Store the Firebase user ID directly in formData
+        if (result.user?.uid) {
+          setFormData((prev) => ({
+            ...prev,
+            firebase_user_id: result.user?.uid || "",
+          }));
+        }
+
+        console.log("Phone number verified successfully!");
+      } else {
+        setError(result.error || "Invalid OTP. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      setError("Verification failed. Please try again.");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
   const handleChange = async (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -95,20 +214,30 @@ export default function SignupModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!phoneVerified) {
+      setError("Please verify your phone number first");
+      return;
+    }
     setError(null);
     setLoading(true);
 
     try {
-      // Call register API
-      const registerRes = await api.post(API_URL.AUTH.SIGNUP, {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-      console.log(registerRes);
+      // Call firebase API
+      // const firebaseRes = await api.post(API_URL.FIREBASE.PHONE_NUMBER, {
+      //   phone_number: formData.phone.startsWith("+91")
+      //     ? formData.phone
+      //     : `+91${formData.phone.replace(/^0+/, "")}`,
+      // });
+      // console.log(firebaseRes);
 
-      // Call student API
-      const studentRes = await api.post(API_URL.STUDENT.BASIC, formData);
+      // Add firebase_user_id to formData
+      const studentData = {
+        ...formData,
+        firebase_user_id: formData.firebase_user_id,
+      };
+
+      // Call student API with updated data
+      const studentRes = await api.post(API_URL.STUDENT.BASIC, studentData);
       console.log(studentRes);
       // Store student details in sessionStorage
       if (
@@ -123,6 +252,7 @@ export default function SignupModal({
             student_uuid: studentRes.data.student_uuid,
             name: studentRes.data.name,
             email: studentRes.data.email,
+            phone: studentRes.data.phone,
           })
         );
       }
@@ -138,7 +268,9 @@ export default function SignupModal({
         role: "student",
         class_id: "",
         stream_id: "",
+        firebase_user_id: "",
       });
+      setAuth();
       router.push("/user/dashboard/instructions");
     } catch (err) {
       console.log(err);
@@ -320,43 +452,104 @@ export default function SignupModal({
                   />
                 </div>
 
+                {/* Email Input */}
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiMail className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Email Address"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
+                  />
+                </div>
+
                 {/* Contact Info Row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Phone Input */}
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+                  {/* Phone Input with OTP */}
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <FiPhone className="h-5 w-5 text-gray-400" />
                     </div>
-                    <input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      placeholder="Phone Number"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
-                    />
-                  </div>
-                  {/* Email Input */}
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiMail className="h-5 w-5 text-gray-400" />
+                    <div className="grid grid-cols-3 gap-2">
+                      <input
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        placeholder="Phone Number"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        disabled={otpSent}
+                        className={`w-full ${
+                          !otpSent && !phoneVerified
+                            ? "col-span-2"
+                            : "col-span-3"
+                        } pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors`}
+                      />
+                      {!otpSent && !phoneVerified && (
+                        <button
+                          type="button"
+                          onClick={handleSendOTP}
+                          disabled={sendingOtp}
+                          className="px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed col-span-1"
+                        >
+                          {sendingOtp ? "Sending..." : "Send OTP"}
+                        </button>
+                      )}
                     </div>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      placeholder="Email Address"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
-                    />
                   </div>
+                  {/* OTP Input */}
+                  {otpSent && !phoneVerified && (
+                    <div className="relative">
+                      <div className="grid grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter OTP"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                          className="w-full col-span-2 pl-3 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleVerifyOTP}
+                          disabled={verifyingOtp}
+                          className="px-4 py-2.5 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed col-span-1"
+                        >
+                          {verifyingOtp ? "Verifying..." : "Verify OTP"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {/* Phone Verification Status */}
+                  {phoneVerified && (
+                    <div className="p-2 bg-green-500/10 border border-green-500/20 rounded-lg">
+                      <p className="text-sm text-green-400 flex items-center">
+                        <svg
+                          className="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        Phone number verified
+                      </p>
+                    </div>
+                  )}
                 </div>
                 {/* Password Row */}
-                <div className="relative">
+                {/* <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <FiLock className="h-5 w-5 text-gray-400" />
                   </div>
@@ -370,7 +563,7 @@ export default function SignupModal({
                     required
                     className="w-full pl-10 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
                   />
-                </div>
+                </div> */}
 
                 {error && (
                   <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
@@ -412,6 +605,7 @@ export default function SignupModal({
           </div>
         )}
       </div>
+      <div id="recaptcha-container" className="hidden"></div>
     </div>
   );
 }
