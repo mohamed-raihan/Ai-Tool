@@ -623,7 +623,7 @@ const ResultsPage = () => {
                     </th>
                   </tr>
                 </thead>
-                {hasSubscription ? (
+                {!hasSubscription ? (
                   <tbody className="bg-gray-800 divide-y divide-gray-700">
                     {findMatchingCareers(results.scores).map(
                       (career, index) => (
@@ -699,7 +699,7 @@ const ResultsPage = () => {
             <h2 className="text-xl font-semibold text-gray-100 mb-4 flex items-center">
               <FiBookOpen className="mr-2 text-orange-500" /> Summary
             </h2>
-            {hasSubscription ? (
+            {!hasSubscription ? (
               <div className="space-y-4">
                 {results.scores
                   .sort((a, b) => b.score - a.score)

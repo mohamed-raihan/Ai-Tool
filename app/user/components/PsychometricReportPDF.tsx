@@ -94,6 +94,89 @@ const styles = StyleSheet.create({
     backgroundColor: "#1a2332",
     color: "#ffffff",
   },
+  coverPage: {
+    flex: 1,
+    backgroundColor: "#181e2a",
+    position: "relative",
+    justifyContent: "space-between",
+    padding: 0,
+  },
+  coverTop: {
+    marginTop: 48,
+    marginLeft: 48,
+  },
+  coverBrand: {
+    fontSize: 14,
+    letterSpacing: 4,
+    color: "#ffffff",
+    fontWeight: "bold",
+    marginBottom: 0,
+  },
+  coverCenter: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    marginLeft: 48,
+    marginTop: 80,
+  },
+  coverMainTitle: {
+    fontSize: 28,
+    color: "#ffffff",
+    letterSpacing: 2,
+    fontWeight: 400,
+    marginBottom: 0,
+  },
+  coverAccentTitle: {
+    fontSize: 36,
+    color: "#ff6b00",
+    fontWeight: "bold",
+    letterSpacing: 2,
+    marginTop: 0,
+  },
+  coverBottom: {
+    marginLeft: 48,
+    marginBottom: 48,
+  },
+  coverInfo: {
+    fontSize: 12,
+    color: "#d1d5db",
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  // Abstract shapes (right side)
+  coverShape1: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    width: 260,
+    height: 600,
+    backgroundColor: "#232c3e",
+    borderTopLeftRadius: 300,
+    borderBottomLeftRadius: 300,
+    opacity: 0.85,
+  },
+  coverShape2: {
+    position: "absolute",
+    right: -30,
+    top: 80,
+    width: 200,
+    height: 500,
+    backgroundColor: "#28344a",
+    borderTopLeftRadius: 200,
+    borderBottomLeftRadius: 200,
+    opacity: 0.6,
+  },
+  coverShape3: {
+    position: "absolute",
+    right: 10,
+    top: 200,
+    width: 120,
+    height: 300,
+    backgroundColor: "#ff6b00",
+    borderTopLeftRadius: 120,
+    borderBottomLeftRadius: 120,
+    opacity: 0.18,
+  },
   header: {
     marginBottom: 20,
   },
@@ -141,7 +224,7 @@ const styles = StyleSheet.create({
     color: "#ff6b00",
   },
   interestBar: {
-    marginBottom: 15,
+    marginBottom: 18,
   },
   interestLabel: {
     flexDirection: "row",
@@ -150,36 +233,79 @@ const styles = StyleSheet.create({
   },
   labelText: {
     color: "#ffffff",
+    fontSize: 12,
+    width: 80,
   },
-  progressBarContainer: {
-    height: 8,
-    backgroundColor: "#374151",
-    borderRadius: 4,
-    marginTop: 5,
+  progressBarWrapper: {
+    position: "relative",
+    height: 12,
+    marginBottom: 2,
   },
-  progressBarLow: {
-    height: "100%",
+  progressBarRanges: {
+    flexDirection: "row",
+    width: "100%",
+    height: 12,
+    borderRadius: 6,
+    overflow: "hidden",
+  },
+  progressBarRangeLow: {
+    flex: 1,
     backgroundColor: "#ef4444",
-    borderRadius: 4,
+    opacity: 0.18,
+    borderRightWidth: 1,
+    borderRightColor: "#fff",
   },
-  progressBarModerate: {
-    height: "100%",
+  progressBarRangeModerate: {
+    flex: 1,
     backgroundColor: "#f59e0b",
-    borderRadius: 4,
+    opacity: 0.18,
+    borderRightWidth: 1,
+    borderRightColor: "#fff",
   },
-  progressBarHigh: {
-    height: "100%",
+  progressBarRangeHigh: {
+    flex: 1,
     backgroundColor: "#10b981",
-    borderRadius: 4,
+    opacity: 0.18,
+  },
+  progressBarFill: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    height: 12,
+    borderRadius: 6,
+  },
+  progressBarMarker: {
+    position: "absolute",
+    top: -2,
+    width: 2,
+    height: 16,
+    backgroundColor: "#1a2332",
+    borderRadius: 1,
   },
   legend: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 15,
+    marginTop: 18,
   },
-  legendItem: {
+  legendCol: {
+    alignItems: "center",
+    flex: 1,
+  },
+  legendLabel: {
+    fontSize: 11,
+    fontWeight: "bold",
+    color: "#ef4444",
+    marginBottom: 2,
+  },
+  legendLabelModerate: {
+    color: "#f59e0b",
+  },
+  legendLabelHigh: {
+    color: "#10b981",
+  },
+  legendRange: {
+    fontSize: 9,
     color: "#9ca3af",
-    fontSize: 10,
   },
   interestCircle: {
     width: 40,
@@ -239,6 +365,9 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "#ffffff",
     fontSize: 11,
+  },
+  tableCellSpacer: {
+    width: 20,
   },
   summarySection: {
     marginTop: 20,
@@ -338,6 +467,30 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
 
   return (
     <Document>
+      {/* Cover Page */}
+      <Page size="A4" style={styles.coverPage}>
+        {/* Abstract shapes */}
+        <View style={styles.coverShape1} />
+        <View style={styles.coverShape2} />
+        <View style={styles.coverShape3} />
+        {/* Top brand */}
+        <View style={styles.coverTop}>
+          <Text style={styles.coverBrand}>PREPACADEMY</Text>
+        </View>
+        {/* Centered main title */}
+        <View style={styles.coverCenter}>
+          <Text style={styles.coverMainTitle}>PSYCHOMETRIC</Text>
+          <Text style={styles.coverAccentTitle}>REPORT</Text>
+        </View>
+        {/* Bottom info */}
+        <View style={styles.coverBottom}>
+          <Text style={styles.coverInfo}>Prepared for: {userData.personalInfo.fullName}</Text>
+          <Text style={styles.coverInfo}>Date: {userData.personalInfo.testDate}</Text>
+          <Text style={styles.coverInfo}>Test ID: {userData.personalInfo.testId}</Text>
+        </View>
+      </Page>
+
+      {/* Main Content Page */}
       <Page size="A4" style={styles.page}>
         {/* Main Header */}
         <Text style={styles.title}>Psychometric Assessment Report</Text>
@@ -368,27 +521,71 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
             <Text>Your Interest Analysis</Text>
           </View>
 
-          {userData.scores.map((score, index) => (
-            <View key={index} style={styles.interestBar}>
-              <View style={styles.interestLabel}>
-                <Text style={styles.labelText}>{score.category}</Text>
-                <Text style={styles.labelText}>{score.score}%</Text>
+          {/* Only show the 6 main categories, in order */}
+          {[
+            { name: "Realistic", color: "#ef4444" },
+            { name: "Investigative", color: "#ef4444" },
+            { name: "Artistic", color: "#ef4444" },
+            { name: "Social", color: "#10b981" },
+            { name: "Enterprising", color: "#10b981" },
+            { name: "Conventional", color: "#ef4444" },
+          ].map((category, index) => {
+            const score = userData.scores.find((s) => s.category === category.name)?.score || 0;
+            // Bar color logic
+            let barColor = "#ef4444";
+            if (score > 66) barColor = "#10b981";
+            else if (score > 33) barColor = "#f59e0b";
+            // Marker position
+            const markerLeft = `${score}%`;
+            return (
+              <View key={index} style={styles.interestBar}>
+                <View style={styles.interestLabel}>
+                  <Text style={styles.labelText}>{category.name}</Text>
+                  <Text style={styles.labelText}>{score}%</Text>
+                </View>
+                <View style={styles.progressBarWrapper}>
+                  {/* Score ranges background */}
+                  <View style={styles.progressBarRanges}>
+                    <View style={styles.progressBarRangeLow} />
+                    <View style={styles.progressBarRangeModerate} />
+                    <View style={styles.progressBarRangeHigh} />
+                  </View>
+                  {/* Score bar */}
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      {
+                        width: `${score}%`,
+                        backgroundColor: barColor,
+                      },
+                    ]}
+                  />
+                  {/* Score marker */}
+                  <View
+                    style={[
+                      styles.progressBarMarker,
+                      { left: markerLeft },
+                    ]}
+                  />
+                </View>
               </View>
-              <View style={styles.progressBarContainer}>
-                <View
-                  style={[
-                    getProgressBarStyle(score.score),
-                    { width: `${score.score}%` },
-                  ]}
-                />
-              </View>
-            </View>
-          ))}
+            );
+          })}
 
+          {/* Score range labels */}
           <View style={styles.legend}>
-            <Text style={styles.legendItem}>Low (Score 1-3)</Text>
-            <Text style={styles.legendItem}>Moderate (Score 4-7)</Text>
-            <Text style={styles.legendItem}>High (Score 8-10)</Text>
+            <View style={styles.legendCol}>
+              <Text style={styles.legendLabel}>Low</Text>
+              <Text style={styles.legendRange}>(Score 1-3)</Text>
+            </View>
+            <View style={styles.legendCol}>
+              <Text style={[styles.legendLabel, styles.legendLabelModerate]}>Moderate</Text>
+              <Text style={styles.legendRange}>(Score 4-7)</Text>
+            </View>
+            <View style={styles.legendCol}>
+              <Text style={[styles.legendLabel, styles.legendLabelHigh]}>High</Text>
+              <Text style={styles.legendRange}>(Score 8-10)</Text>
+            </View>
           </View>
         </View>
 
@@ -448,14 +645,25 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
                     </Text>
                     <Text style={styles.scoreText}>{trait.score}%</Text>
                   </View>
-                  <View style={styles.progressBarContainer}>
+                  <View style={styles.progressBarWrapper}>
+                    <View style={styles.progressBarRanges}>
+                      <View style={styles.progressBarRangeLow} />
+                      <View style={styles.progressBarRangeModerate} />
+                      <View style={styles.progressBarRangeHigh} />
+                    </View>
                     <View
                       style={[
-                        styles.progressBarHigh,
+                        styles.progressBarFill,
                         {
                           width: `${trait.score}%`,
                           backgroundColor: trait.color,
                         },
+                      ]}
+                    />
+                    <View
+                      style={[
+                        styles.progressBarMarker,
+                        { left: `${trait.score}%` },
                       ]}
                     />
                   </View>
@@ -479,6 +687,7 @@ const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
                 <View key={index} style={styles.tableRow}>
                   <Text style={styles.tableCell}>{career.name}</Text>
                   <Text style={styles.tableCell}>{career.description}</Text>
+                  <View style={styles.tableCellSpacer} />
                   <Text style={styles.tableCell}>
                     {career.education_pathway
                       .map((edu: string) => `• ${edu}`)
