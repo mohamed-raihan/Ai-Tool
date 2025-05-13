@@ -36,13 +36,27 @@ export default function UsersTable({ users, getStudents }: UsersTableProps) {
     router.push(`/admin/usertable/${userId}/results`);
   };
 
-  const handleDelete = async (student_uuid: string, firebase_user_id: string) => {
+  const handleDelete = async (
+    student_uuid: string,
+    firebase_user_id: string
+  ) => {
     try {
-      // const firbaseres = await api.delete(API_URL.FIREBASE.DELETE_PHONE_NUMBER(firebase_user_id));
-      const response = await api.delete(API_URL.STUDENT.DELETE_BASIC(student_uuid));
+      // Try to delete Firebase user but don't throw error if it fails
+      try {
+        await api.delete(
+          API_URL.FIREBASE.DELETE_PHONE_NUMBER(firebase_user_id)
+        );
+      } catch (firebaseError) {
+        console.log("Firebase deletion failed:", firebaseError);
+      }
+
+      // Continue with student deletion
+      const response = await api.delete(
+        API_URL.STUDENT.DELETE_BASIC(student_uuid)
+      );
       console.log(response);
       getStudents();
-      toast.success("User deleted successfully",);
+      toast.success("User deleted successfully");
     } catch (error) {
       console.log(error);
       toast.error("User deletion failed");
@@ -170,7 +184,12 @@ export default function UsersTable({ users, getStudents }: UsersTableProps) {
                               View Results
                             </button>
                             <button
-                              onClick={() => handleDelete(user.student_uuid,user.firebase_user_id)}
+                              onClick={() =>
+                                handleDelete(
+                                  user.student_uuid,
+                                  user.firebase_user_id
+                                )
+                              }
                               className="text-red-500 hover:text-red-400 bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
                             >
                               Delete

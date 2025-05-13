@@ -38,6 +38,7 @@ export default function CareersPage() {
       const data = await careerService.getCareers();
       setCareers(data);
     } catch (error) {
+      console.log(error);
       toast.error("Failed to fetch careers");
     } finally {
       setLoading(false);
@@ -48,7 +49,9 @@ export default function CareersPage() {
     try {
       const response = await api.get(API_URL.ADMIN.CATEGORY);
       setCategories(response.data);
+      console.log(response.data);
     } catch (error) {
+      console.log(error);
       toast.error("Failed to fetch categories");
     }
   };
@@ -69,6 +72,7 @@ export default function CareersPage() {
       resetForm();
     } catch (error) {
       toast.error("Failed to save career");
+      console.log(error);
     }
   };
 
@@ -85,6 +89,7 @@ export default function CareersPage() {
         toast.success("Career deleted successfully");
         fetchCareers();
       } catch (error) {
+        console.log(error);
         toast.error("Failed to delete career");
       }
     }

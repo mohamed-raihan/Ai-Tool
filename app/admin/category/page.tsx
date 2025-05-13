@@ -25,7 +25,7 @@ export default function CategoryManagement() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [streams, setStreams] = useState<Stream[]>([]);
-  const [selectedClass, setSelectedClass] = useState<string>("");
+  // const [selectedClass, setSelectedClass] = useState<string>("");
   const [newCategory, setNewCategory] = useState("");
   const [newClass, setNewClass] = useState("");
   const [newStream, setNewStream] = useState("");

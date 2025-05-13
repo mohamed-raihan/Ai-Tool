@@ -281,7 +281,7 @@ export function findMatchingCareers(
   const matchingCareers = careerPathsData.filter((career) => {
     // Check if the candidate's traits match the career requirements
     const matchingTraits = career.traits.filter((trait) =>
-      scores.some((score) => {
+      scores?.some((score) => {
         const matches =
           score.category.toLowerCase().includes(trait.toLowerCase()) &&
           score.score >= parseInt(career.score);

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FiDownload, FiFilter, FiSearch } from "react-icons/fi";
+import { FiDownload, FiSearch } from "react-icons/fi";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -12,6 +12,7 @@ import { RiExportFill } from "react-icons/ri";
 
 interface StudentReport {
   id: string;
+  student_uuid: string;
   name: string;
   email: string;
   phone: string;
@@ -31,6 +32,16 @@ interface StudentReport {
   }>;
 }
 
+interface getStudents {
+  id: number;
+  student_uuid: string;
+  name: string;
+  email: string;
+  phone: string;
+  class_name: { id: number; name: string };
+  stream_name: { id: number; name: string };
+}
+
 export default function ReportPage() {
   const [students, setStudents] = useState<StudentReport[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<StudentReport[]>([]);
@@ -43,7 +54,7 @@ export default function ReportPage() {
   const itemsPerPage = 10;
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredStudents.length);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentStudents = filteredStudents.slice(startIndex, endIndex);
@@ -59,15 +70,17 @@ export default function ReportPage() {
   const fetchStudentReports = async () => {
     try {
       const response = await api.get(API_URL.STUDENT.BASIC);
-      const studentData = response.data;
+      console.log(response.data);
+      const studentData = response.data.results;
 
       // Fetch test results for each student
       const reports = await Promise.all(
-        studentData.map(async (student: any) => {
+        studentData.map(async (student: getStudents) => {
           try {
             const resultResponse = await api.get(
               API_URL.RESULT.GET_RESULT(student.student_uuid)
             );
+            console.log(resultResponse);
             const testResult = resultResponse.data[0];
             console.log(testResult);
 
@@ -107,6 +120,8 @@ export default function ReportPage() {
       console.error("Error fetching student reports:", error);
     }
   };
+
+  console.log(students);
 
   const handleDateFilter = () => {
     let filtered = [...students];
@@ -193,7 +208,7 @@ export default function ReportPage() {
 
   return (
     <div className="min-h-screen bg-gray-900 p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mt-10 mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-white">Student Reports</h1>
           <div className="flex gap-4">
@@ -237,9 +252,9 @@ export default function ReportPage() {
         </div>
 
         <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto h-[70vh] overflow-y-auto">
             <table className="min-w-full divide-y divide-gray-700 text-sm">
-              <thead className="bg-gray-900">
+              <thead className="bg-gray-900 sticky top-0 z-10">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Student Details
@@ -285,7 +300,7 @@ export default function ReportPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {student.career_recommendations?.map(
-                          (career: any, index) => (
+                          (career: { name: string }, index) => (
                             <span
                               key={index}
                               className="px-2 py-1 text-xs bg-orange-500 text-white rounded-full"

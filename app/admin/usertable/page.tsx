@@ -29,7 +29,7 @@ export default function AdminUsersPage() {
   const getStudents = async ()=>{
     try{
       const response = await api.get(API_URL.STUDENT.BASIC)
-      setStudents(response.data)
+      setStudents(response.data.results)
       console.log(response.data)
       return response.data
     }catch(error){

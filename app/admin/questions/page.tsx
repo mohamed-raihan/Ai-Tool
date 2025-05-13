@@ -10,7 +10,6 @@ import { toast } from "react-toastify";
 import { FiEdit2, FiTrash2, FiX, FiCheck } from "react-icons/fi";
 import { API_URL } from "@/app/services/api_url";
 import api from "@/app/lib/axios";
-import { Select } from "@react-pdf/renderer";
 
 interface Class {
   id: number;
@@ -37,7 +36,7 @@ function QuestionsPage() {
     stream_id: "",
   });
   const [loading, setLoading] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | number | null>(null);
   const [editForm, setEditForm] = useState<CreateQuestionDto>({
     text: "",
     category_id: "",
@@ -73,6 +72,7 @@ function QuestionsPage() {
       console.log(response.data);
       setClasses(response.data);
     } catch (error) {
+      console.error("Error fetching classes:", error);
       toast.error("Failed to fetch classes");
     }
   };
@@ -82,6 +82,7 @@ function QuestionsPage() {
       const response = await api.get(API_URL.ADMIN.CATEGORY);
       setCategories(response.data);
     } catch (error) {
+      console.error("Error fetching categories:", error);
       toast.error("Failed to fetch categories");
     }
   };
@@ -101,6 +102,7 @@ function QuestionsPage() {
       setNewQuestion({ text: "", category_id: "", class_id: "", stream_id: "" }); // Clear form
       fetchQuestions(); // Refresh questions list
     } catch (error) {
+      console.error("Error adding question:", error);
       toast.error("Failed to add question");
     } finally {
       setLoading(false);
@@ -117,6 +119,7 @@ function QuestionsPage() {
       toast.success("Question deleted successfully");
       fetchQuestions(); // Refresh the list
     } catch (error) {
+      console.error("Error deleting question:", error);
       toast.error("Failed to delete question");
     }
   };
@@ -140,7 +143,7 @@ function QuestionsPage() {
     setEditForm({ text: "", category_id: "", class_id: "", stream_id: "" });
   };
 
-  const handleUpdate = async (id: string) => {
+  const handleUpdate = async (id: string | number) => {
     if (!editForm.text.trim() || !editForm.category_id.trim()) {
       toast.error("Please fill in all fields");
       return;
@@ -152,6 +155,7 @@ function QuestionsPage() {
       setEditingId(null);
       fetchQuestions(); // Refresh the list
     } catch (error) {
+      console.error("Error updating question:", error);
       toast.error("Failed to update question");
     }
   };

@@ -1,7 +1,7 @@
 // pages/dashboard.tsx
 "use client";
 import { useEffect, useState } from "react";
-import { Home, BarChart2, FileText, Users, FilePlus } from "lucide-react";
+import { Home, Users, FilePlus } from "lucide-react";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -33,16 +33,32 @@ interface StudentData {
   created_at?: string;
 }
 
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  class_name: { name: string };
+  stream_name: { name: string };
+  created_at: string;
+}
+
 const Dashboard: NextPage = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("home");
-  const router = useRouter();
-  const [students, setStudents] = useState<any[]>([]);
+  // const router = useRouter();
+  const [students, setStudents] = useState<Student[]>([]);
+  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
+  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
-  const fetchStudents = async () => {
+  const fetchStudents = async (url?: string) => {
     try {
-      const respons = await api.get(API_URL.STUDENT.BASIC);
-      setStudents(respons.data);
-      console.log(respons);
+      const respons = await api.get(url || API_URL.STUDENT.BASIC);
+      setStudents(respons.data.results);
+      setNextPageUrl(respons.data.next);
+      setPrevPageUrl(respons.data.previous);
+      setTotalCount(respons.data.count);
     } catch (error) {
       console.log(error);
     }
@@ -53,7 +69,7 @@ const Dashboard: NextPage = () => {
   }, []);
 
   // Sample student data
-  const studentData: StudentData[] = students.map((student) => ({
+  const studentData: StudentData[] = students?.map((student) => ({
     name: student.name,
     avatarColor: "bg-red-500",
     Email: student.email,
@@ -73,10 +89,12 @@ const Dashboard: NextPage = () => {
     )
     .slice(0, 10);
 
-  const handleTestNavigation = () => {
-    setActiveMenuItem("test");
-    // router.push("/test");
-  };
+  console.log(loginData);
+
+  // const handleTestNavigation = () => {
+  //   setActiveMenuItem("test");
+  //   // router.push("/test");
+  // };
 
   const handleUserNavigation = () => {
     setActiveMenuItem("user");
@@ -281,12 +299,12 @@ const Dashboard: NextPage = () => {
           </header>
 
           {/* Dashboard Content */}
-          <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 grid grid-cols-1 h-[85vh] rounded-lg overflow-y-hidden md:grid-cols-2 gap-4">
             {/* Understand Section */}
-            <div className="bg-gray-800/50 backdrop-blur-sm col rounded-lg p-4 border border-gray-700/50">
+            <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700/50 flex flex-col">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="font-medium text-white text-lg">Understand</h2>
-                <div className="text-xs text-gray-400">Time Entry Week</div>
+                <h2 className="font-medium text-white text-lg">Students</h2>
+                {/* <div className="text-xs text-gray-400">Time Entry Week</div> */}
               </div>
 
               <div className="grid grid-cols-3 gap-4 mb-4">
@@ -306,86 +324,123 @@ const Dashboard: NextPage = () => {
                 </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-700/50">
-                  <thead>
-                    <tr className="text-xs text-gray-400 bg-gray-900/50">
-                      <th className="px-4 py-2 text-left">Name</th>
-                      <th className="px-4 py-2 text-left">Email</th>
-                      <th className="px-4 py-2 text-left">Phone</th>
-                      <th className="px-4 py-2 text-left">Class</th>
-                      <th className="px-4 py-2 text-left">Stream</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-700/50">
-                    {studentData.map((student, index) => (
-                      <tr
-                        key={index}
-                        className="text-sm hover:bg-gray-700/50 transition-colors"
-                      >
-                        <td className="px-4 py-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium">
-                              {student.name.charAt(0).toUpperCase()}
-                            </div>
-                            <span>{student.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-2">{student.Email}</td>
-                        <td className="px-4 py-2">{student.Phone}</td>
-                        <td className="px-4 py-2">{student.Class}</td>
-                        <td className="px-4 py-2">{student.Stream}</td>
+              <div className="overflow-x-auto flex-1 min-h-0">
+                <div className="h-[55vh] overflow-y-auto rounded">
+                  <table className="min-w-full divide-y divide-gray-700/50">
+                    <thead>
+                      <tr className="text-xs text-gray-400 bg-gray-900/50">
+                        <th className="px-4 py-2 text-left">Name</th>
+                        <th className="px-4 py-2 text-left">Email</th>
+                        <th className="px-4 py-2 text-left">Phone</th>
+                        <th className="px-4 py-2 text-left">Class</th>
+                        <th className="px-4 py-2 text-left">Stream</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-700/50">
+                      {studentData.map((student, index) => (
+                        <tr
+                          key={index}
+                          className="text-sm hover:bg-gray-700/50 transition-colors"
+                        >
+                          <td className="px-4 py-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium">
+                                {student.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span>{student.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-2">{student.Email}</td>
+                          <td className="px-4 py-2">{student.Phone}</td>
+                          <td className="px-4 py-2">{student.Class}</td>
+                          <td className="px-4 py-2">{student.Stream}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Pagination Controls */}
+                <div className="flex justify-between items-center mt-4">
+                  <button
+                    className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+                    onClick={() => {
+                      if (prevPageUrl) {
+                        fetchStudents(prevPageUrl);
+                        setCurrentPage((prev) => Math.max(prev - 1, 1));
+                      }
+                    }}
+                    disabled={!prevPageUrl}
+                  >
+                    Previous
+                  </button>
+                  <span className="text-gray-300">
+                    Page {currentPage} of {Math.ceil(totalCount / 10)}
+                  </span>
+                  <button
+                    className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50"
+                    onClick={() => {
+                      if (nextPageUrl) {
+                        fetchStudents(nextPageUrl);
+                        setCurrentPage((prev) => prev + 1);
+                      }
+                    }}
+                    disabled={!nextPageUrl}
+                  >
+                    Next
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* Report Section */}
-            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700/50">
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg p-4 border border-gray-700/50 flex flex-col">
               <h2 className="font-medium text-white text-lg mb-4">
                 Recent Login
               </h2>
 
-              <div className="space-y-2">
-                {studentData.map((student, index) => (
-                  <div className="bg-gray-800/50 backdrop-blur-sm p-3 rounded-md border border-gray-700/50 hover:bg-gray-700/50 transition-colors">
-                    <div className="flex justify-between items-center mb-2">
-                      <div className="text-white font-medium">
-                        {student.name}
+              <div className="space-y-2 flex-1 min-h-0">
+                <div className="h-[70vh] overflow-y-auto rounded">
+                  {studentData.map((student, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-gray-800/50 backdrop-blur-sm p-3 rounded-md border border-gray-700/50 hover:bg-gray-700/50 transition-colors"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="text-white font-medium">
+                          {student.name}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
+                            in progress
+                          </span>
+                          <button>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M9 18L15 12L9 6"
+                                stroke="white"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
-                          in progress
-                        </span>
-                        <button>
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M9 18L15 12L9 6"
-                              stroke="white"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </button>
+                      <div className="flex items-center gap-2 text-sm text-gray-400">
+                        <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xs text-white">
+                          {student.name.charAt(0)}
+                        </div>
+                        <span>Logged in at {student.created_at}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
-                      <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xs text-white">
-                        {student.name.charAt(0)}
-                      </div>
-                      <span>Logged in at {student.created_at}</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
