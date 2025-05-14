@@ -3,8 +3,9 @@
 
 import React, { useState } from "react";
 import { CheckCircle } from "lucide-react";
-import TestTimer from "../dashboard/test/timer/page";
+// import TestTimer from "../dashboard/test/timer/page";
 import { useRouter } from "next/navigation";
+import TestTimer from "./timer";
 
 interface Option {
   id: number;

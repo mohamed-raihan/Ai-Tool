@@ -8,10 +8,11 @@ import {
   Question,
 } from "../../../services/questions.service";
 import { toast } from "react-toastify";
-import TestTimer from "./timer/page";
+// import TestTimer from "./timer/page";
 import { calculateScores } from "../../../utils/testCalculations";
 import { PersonalityService } from "../../../services/personality.service";
 import { Answer } from "../../../types/test";
+import TestTimer from "../../components/timer";
 
 interface Option {
   id: string;
