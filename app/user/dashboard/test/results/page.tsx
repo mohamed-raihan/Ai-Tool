@@ -7,7 +7,7 @@ import {
   FiBarChart2,
   FiBookOpen,
 } from "react-icons/fi";
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import PsychometricReportPDF from "@/app/user/components/PsychometricReportPDF";
 import { findMatchingCareers } from "@/app/utils/careerMapping";
 import {
@@ -35,7 +35,7 @@ interface TestResult {
 
 const ResultsPage = () => {
   const [results, setResults] = useState<TestResult | null>(null);
-  const [showPDF, setShowPDF] = useState(false);
+  // const [showPDF, setShowPDF] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [hasSubscription, setHasSubscription] = useState(false);
   const router = useRouter();

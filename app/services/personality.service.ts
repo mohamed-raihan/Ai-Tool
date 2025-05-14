@@ -165,7 +165,13 @@ export class PersonalityService {
     };
   }
 
-  private calculateTraitPercentages(counters: any): {
+  private calculateTraitPercentages(counters: {
+    EI: { primary: number; total: number };
+    SN: { primary: number; total: number };
+    TF: { primary: number; total: number };
+    JP: { primary: number; total: number };
+    AT: { primary: number; total: number };
+  }): {
     EI: PersonalityTrait;
     SN: PersonalityTrait;
     TF: PersonalityTrait;

@@ -3,26 +3,41 @@
 import React, { useEffect, useState } from "react";
 import {
   FiUser,
-  FiMail,
   FiPhone,
   FiMapPin,
   FiCalendar,
-  FiAward,
   FiUsers,
   FiBook,
-  FiHeart,
-  FiBriefcase,
-  FiBarChart2,
   FiTarget,
-  FiCpu,
-  FiLayers,
-  FiPieChart,
 } from "react-icons/fi";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 
+interface student {
+  id: string;
+  name: string;
+  uuid: string;
+  student_uuid: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: string;
+  address: string;
+  studying_in: string;
+  specification: string;
+  college: string;
+  course: string;
+  passing_year: string;
+  university: string;
+  hobbies: string;
+  curicular_activities: string;
+  achievements: string;
+  internship_projects: string;
+  languages_known: string;
+}
+
 export default function StudentProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<student | null>(null);
   const [loading, setLoading] = useState(true);
 
   const getUser = async () => {
@@ -30,8 +45,8 @@ export default function StudentProfilePage() {
       const response = await api.get(API_URL.STUDENT.BASIC);
       const studentId = localStorage.getItem("studentId");
       if (studentId) {
-        const matchedUser = response.data.find(
-          (user: any) => user.id === studentId
+        const matchedUser = response.data.results.find(
+          (user: student) => user.id === studentId
         );
         setUser(matchedUser);
       }

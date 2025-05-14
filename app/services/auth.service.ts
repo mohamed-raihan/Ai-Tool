@@ -68,6 +68,7 @@ class AuthService {
     try {
       await api.post(API_URL.AUTH.FORGOT_PASSWORD, { email });
     } catch (error) {
+      console.log(error);
       throw this.handleError(error);
     }
   }

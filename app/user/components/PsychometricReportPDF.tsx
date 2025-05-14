@@ -13,49 +13,49 @@ import {
 } from "@/app/utils/careerMapping";
 
 // Define interfaces for the data structure
-interface PersonalInfo {
-  fullName: string;
-  [key: string]: string;
-}
+// interface PersonalInfo {
+//   fullName: string;
+//   [key: string]: string;
+// }
 
-interface AptitudeResults {
-  personalityTraits: string[];
-  overallScore: string;
-  overallPercentile: number;
-  [key: string]: string | string[] | number;
-}
+// interface AptitudeResults {
+//   personalityTraits: string[];
+//   overallScore: string;
+//   overallPercentile: number;
+//   [key: string]: string | string[] | number;
+// }
 
-interface RecommendedField {
-  field: string;
-  matchScore: number;
-  reason: string;
-}
+// interface RecommendedField {
+//   field: string;
+//   matchScore: number;
+//   reason: string;
+// }
 
-interface EducationInterest {
-  course: string;
-  interest: string;
-  notes: string;
-}
+// interface EducationInterest {
+//   course: string;
+//   interest: string;
+//   notes: string;
+// }
 
-interface FamilyMember {
-  relation: string;
-  name: string;
-  education: string;
-  profession: string;
-}
+// interface FamilyMember {
+//   relation: string;
+//   name: string;
+//   education: string;
+//   profession: string;
+// }
 
-interface FamilyBackground {
-  notes: string;
-  educationalHistory: FamilyMember[];
-}
+// interface FamilyBackground {
+//   notes: string;
+//   educationalHistory: FamilyMember[];
+// }
 
-interface Assessment {
-  test: string;
-  date: string;
-  score?: string;
-  primaryInterests?: string;
-  style?: string;
-}
+// interface Assessment {
+//   test: string;
+//   date: string;
+//   score?: string;
+//   primaryInterests?: string;
+//   style?: string;
+// }
 
 // interface UserData {
 //   personalInfo: PersonalInfo;

@@ -1,5 +1,3 @@
-import { careerService } from "../services/careers.service";
-
 interface CareerPath {
   id: string;
   name: string;
@@ -246,7 +244,7 @@ export const careerPaths: CareerPath[] = [
   }
 ];
 
-let careerPathsData: CareerPath[] = careerPaths;
+const careerPathsData: CareerPath[] = careerPaths;
 
 // const fetchCareerPaths = async () => {
 //   try {

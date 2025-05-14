@@ -3,7 +3,7 @@ import api from "../lib/axios";
 export interface Question {
   id: number | string;
   text: string;
-  category: { id: number; name: string; description: string | null; careers: any[] };
+  category: { id: number; name: string; description: string | null; careers: [] };
   class_name: { id: number; name: string };
   stream_name: { id: number; name: string };
   dimension?: string | null;

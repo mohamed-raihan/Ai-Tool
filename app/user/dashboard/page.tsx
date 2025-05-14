@@ -3,7 +3,7 @@
 import {  useState } from "react";
 import { Home, BarChart2, FileText, User } from "lucide-react";
 import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TestPage from "./test/page";
 import ProfileWizard from "./profile/page";
