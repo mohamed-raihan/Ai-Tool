@@ -14,7 +14,6 @@ const categories = [
 export default function AddQuestion() {
   const [formData, setFormData] = useState<CreateQuestionDto>({
     text: '',
-    category: '',
     class_id: '',
     stream_id: '',
     category_id: ''
@@ -65,7 +64,7 @@ export default function AddQuestion() {
       toast.success('Question added successfully!');
       
       // Reset form
-      setFormData({ text: '', category: '', class_id: '', stream_id: '', category_id: '' });
+      setFormData({ text: '', class_id: '', stream_id: '', category_id: '' });
       setSelectedCategories([]);
     } catch (error) {
       toast.error('Failed to add question');

@@ -14,7 +14,6 @@ export interface Question {
 export interface CreateQuestionDto {
   text: string;
   category_id: string;
-  category: string;
   class_id: string;
   stream_id: string;
 }
