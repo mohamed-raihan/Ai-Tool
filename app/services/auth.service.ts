@@ -1,6 +1,6 @@
-import api from '../lib/axios';
-import { API_URL } from './api_url';
-
+import api from "../lib/axios";
+import { API_URL } from "./api_url";
+import { AxiosError } from "axios";
 
 export interface LoginCredentials {
   email: string;
@@ -33,11 +33,14 @@ class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     console.log(credentials);
     try {
-      const response = await api.post<AuthResponse>(API_URL.AUTH.LOGIN, credentials);
+      const response = await api.post<AuthResponse>(
+        API_URL.AUTH.LOGIN,
+        credentials
+      );
       this.setTokens(response.data.tokens.access, response.data.tokens.refresh);
       return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.handleError(error as AxiosError<{ message: string }>);
     }
   }
 
@@ -47,7 +50,7 @@ class AuthService {
       this.setTokens(response.data.tokens.access, response.data.tokens.refresh);
       return response.data;
     } catch (error) {
-      throw this.handleError(error);
+      throw this.handleError(error as AxiosError<{ message: string }>);
     }
   }
 
@@ -69,7 +72,7 @@ class AuthService {
       await api.post(API_URL.AUTH.FORGOT_PASSWORD, { email });
     } catch (error) {
       console.log(error);
-      throw this.handleError(error);
+      throw this.handleError(error as AxiosError<{ message: string }>);
     }
   }
 
@@ -85,28 +88,28 @@ class AuthService {
   // }
 
   private setTokens(token: string, refreshToken: string): void {
-    localStorage.setItem('token', token);
-    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem("token", token);
+    localStorage.setItem("refreshToken", refreshToken);
   }
 
   private clearTokens(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
+    localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
   }
 
-  private handleError(error: any): Error {
+  private handleError(error: AxiosError<{ message: string }>): Error {
     if (error.response) {
       // Server responded with error
-      const message = error.response.data.message || 'An error occurred';
+      const message = error.response.data?.message || "An error occurred";
       return new Error(message);
     }
     if (error.request) {
       // Request made but no response
-      return new Error('No response from server');
+      return new Error("No response from server");
     }
     // Other errors
-    return new Error('Request failed');
+    return new Error("Request failed");
   }
 }
 
-export const authService = new AuthService(); 
+export const authService = new AuthService();

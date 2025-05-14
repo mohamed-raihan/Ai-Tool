@@ -42,6 +42,13 @@ interface getStudents {
   stream_name: { id: number; name: string };
 }
 
+interface AptitudeScore {
+  category: string;
+  score: number;
+  percentile: number;
+  interpretation?: string;
+}
+
 export default function ReportPage() {
   const [students, setStudents] = useState<StudentReport[]>([]);
   const [filteredStudents, setFilteredStudents] = useState<StudentReport[]>([]);
@@ -80,6 +87,8 @@ export default function ReportPage() {
               API_URL.RESULT.GET_RESULT(student.student_uuid)
             );
             const testResult = resultResponse.data[0];
+            console.log(testResult);
+            
 
             return {
               id: student.id,
@@ -93,7 +102,7 @@ export default function ReportPage() {
                 testResult?.personality_test?.type || "Not Available",
               primary_trait:
                 testResult?.aptitude_test?.scores?.sort(
-                  (a: any, b: any) => b.score - a.score
+                  (a: AptitudeScore, b: AptitudeScore) => b.score - a.score
                 )[0]?.category || "Not Available",
               career_recommendations:
                 findMatchingCareers(testResult?.aptitude_test?.scores) || [],
@@ -107,6 +116,9 @@ export default function ReportPage() {
           }
         })
       );
+
+      console.log(reports);
+      
 
       const validReports = reports.filter((report) => report !== null);
       setStudents(validReports);
@@ -125,7 +137,7 @@ export default function ReportPage() {
       console.error("Error fetching student reports:", error);
     }
   };
-
+  
   console.log(students);
   console.log(filteredStudents);
 

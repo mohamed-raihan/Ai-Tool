@@ -10,8 +10,14 @@ import { toast } from "react-toastify";
 // Add this interface at the top of the file, after the imports
 interface RazorpayWindow extends Window {
   Razorpay: {
-    new(options: any): any;
+    new (options: RazorpayOptions): RazorpayInstance;
   };
+}
+
+interface RazorpayInstance {
+  open: () => void;
+  close: () => void;
+  on: (event: string, handler: (response: RazorpayResponse) => void) => void;
 }
 
 // Add these interfaces after the RazorpayWindow interface
@@ -26,9 +32,33 @@ interface RazorpayOptions {
   prefill: {
     name: string;
     email: string;
+    contact?: string;
   };
   theme: {
     color: string;
+    backdrop_color?: string;
+    hide_topbar?: boolean;
+  };
+  modal?: {
+    ondismiss?: () => void;
+    escape?: boolean;
+    backdropclose?: boolean;
+  };
+  config?: {
+    display: {
+      blocks?: {
+        banks?: {
+          name: string;
+          instruments: Array<{
+            method: string;
+          }>;
+        };
+      };
+      sequence?: string[];
+      preferences?: {
+        show_default_blocks?: boolean;
+      };
+    };
   };
 }
 
@@ -80,7 +110,10 @@ const PaymentPage = () => {
     }
 
     // ✅ Ensure Razorpay SDK is loaded
-    if (typeof window === "undefined" || !(window as unknown as RazorpayWindow).Razorpay) {
+    if (
+      typeof window === "undefined" ||
+      !(window as unknown as RazorpayWindow).Razorpay
+    ) {
       alert("Razorpay SDK not loaded. Please refresh and try again.");
       return;
     }
@@ -97,9 +130,9 @@ const PaymentPage = () => {
 
       const order = res.data;
       console.log(order);
-      
+
       const options: RazorpayOptions = {
-        key: order.razorpay_key || process.env.RAZORPAY_KEY_ID || '',
+        key: order.razorpay_key || process.env.RAZORPAY_KEY_ID || "",
         amount: order.amount * 100, // ensure amount is in paisa
         currency: "INR",
         name: "Prepacademy",
