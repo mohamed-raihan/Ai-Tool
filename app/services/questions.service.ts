@@ -401,10 +401,10 @@ export const questionsService = {
     try {
       const response = await api.get("/api/question/");
       console.log(response.data);
-      if (response.data.length > 0) {
+      if (response.data.length > 9) {
         console.log(defaultQuestions);
-        return defaultQuestions;
-        // return response.data;
+        // return defaultQuestions;
+        return response.data;
       } else {
         return defaultQuestions;
       }

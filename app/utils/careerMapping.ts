@@ -1,3 +1,5 @@
+import { careerService } from "../services/careers.service";
+
 interface CareerPath {
   id: string;
   name: string;
@@ -241,32 +243,32 @@ export const careerPaths: CareerPath[] = [
     ],
     traits: ["Enterprising", "Communication", "Strategic", "Persuasive"],
     score: "75",
-  }
+  },
 ];
 
-const careerPathsData: CareerPath[] = careerPaths;
+let careerPathsData: CareerPath[] = careerPaths;
 
-// const fetchCareerPaths = async () => {
-//   try {
-//     const res = await careerService.getCareers();
-//     console.log(res);
-//     if (res && res.length > 0) {
-//       careerPathsData = res.map((career: any) => ({
-//         id: career.id,
-//         name: career.name,
-//         description: career.description,
-//         education_pathway: career.education_pathway,
-//         traits: career.traits,
-//         score: career.score || "70",
-//       }));
-//     }
-//   } catch (error) {
-//     console.error("Error fetching career paths:", error);
-//   }
-// };
+const fetchCareerPaths = async () => {
+  try {
+    const res = await careerService.getCareers();
+    console.log(res);
+    if (res && res.length > 10) {
+      careerPathsData = res.map((career: any) => ({
+        id: career.id,
+        name: career.name,
+        description: career.description,
+        education_pathway: career.education_pathway,
+        traits: career.traits,
+        score: career.score || "70",
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching career paths:", error);
+  }
+};
 
 // Fetch career paths on module load
-// fetchCareerPaths();
+fetchCareerPaths();
 
 export function findMatchingCareers(
   scores: Array<{ category: string; score: number }>
