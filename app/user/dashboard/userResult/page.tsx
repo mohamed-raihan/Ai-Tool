@@ -144,7 +144,43 @@ export default function UserResultsPage() {
         },
       ],
       scores: result.aptitude_test.scores,
-      personalityTraits: result.personality_test,
+      personalityTraits: result.personality_test
+        ? {
+            ...result.personality_test,
+            traits: {
+              EI: {
+                ...result.personality_test.traits.EI,
+                primary: "Introversion",
+                secondary: "Extraversion",
+                color: "#10B981",
+              },
+              SN: {
+                ...result.personality_test.traits.SN,
+                primary: "Sensing",
+                secondary: "Intuition",
+                color: "#F59E0B",
+              },
+              TF: {
+                ...result.personality_test.traits.TF,
+                primary: "Feeling",
+                secondary: "Thinking",
+                color: "#3B82F6",
+              },
+              JP: {
+                ...result.personality_test.traits.JP,
+                primary: "Perceiving",
+                secondary: "Judging",
+                color: "#8B5CF6",
+              },
+              AT: {
+                ...result.personality_test.traits.AT,
+                primary: "Turbulent",
+                secondary: "Assertive",
+                color: "#EC4899",
+              },
+            },
+          }
+        : undefined,
     };
   };
 
@@ -505,9 +541,9 @@ export default function UserResultsPage() {
                       : "second strongest characteristic";
                   return (
                     <p key={index} className="text-gray-300">
-                      {user?.name}&apos;s {strengthWords} is in the {trait.category}{" "}
-                      domain, with a score of {trait.score}%. This indicates{" "}
-                      {trait.interpretation}.
+                      {user?.name}&apos;s {strengthWords} is in the{" "}
+                      {trait.category} domain, with a score of {trait.score}%.
+                      This indicates {trait.interpretation}.
                     </p>
                   );
                 })}
