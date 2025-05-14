@@ -16,7 +16,8 @@ export default function AddQuestion() {
     text: '',
     category: '',
     class_id: '',
-    stream_id: ''
+    stream_id: '',
+    category_id: ''
   });
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,7 +65,7 @@ export default function AddQuestion() {
       toast.success('Question added successfully!');
       
       // Reset form
-      setFormData({ text: '', category: '', class_id: '', stream_id: '' });
+      setFormData({ text: '', category: '', class_id: '', stream_id: '', category_id: '' });
       setSelectedCategories([]);
     } catch (error) {
       toast.error('Failed to add question');
