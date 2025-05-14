@@ -2,25 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import {
-  FiUser,
-  FiMail,
-  FiPhone,
-  FiMapPin,
-  FiCalendar,
-  FiAward,
-  FiUsers,
-  FiBook,
-  FiHeart,
-  FiBriefcase,
-  FiBarChart2,
-  FiTarget,
-  FiCpu,
-  FiLayers,
-  FiPieChart,
-  FiDownload,
-  FiPrinter,
-} from "react-icons/fi";
+import { FiDownload } from "react-icons/fi";
 import jsPDF from "jspdf";
 import autoTable, { UserOptions } from "jspdf-autotable";
 import api from "@/app/lib/axios";
@@ -36,11 +18,22 @@ declare module "jspdf" {
   }
 }
 
+interface Student {
+  id: number;
+  student_uuid: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  dob: string;
+  gender: string;
+}
+
 export default function StudentProfilePage() {
   const { id } = useParams();
   console.log(id)
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<Student>();
 
   // Mock user data - in a real app, you'd fetch this using the id
   const userData = {
@@ -182,30 +175,30 @@ export default function StudentProfilePage() {
   };
 
   // Helper function to render progress bars with labels
-  const renderProgressBar = (value: number, label: string) => (
-    <div className="mb-3">
-      <div className="flex justify-between mb-1">
-        <span className="text-sm font-medium text-gray-700">{label}</span>
-        <span className="text-sm font-medium text-gray-700">{value}%</span>
-      </div>
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div
-          className="h-2.5 rounded-full"
-          style={{
-            width: `${value}%`,
-            backgroundColor:
-              value > 90
-                ? "#10B981"
-                : value > 75
-                ? "#3B82F6"
-                : value > 60
-                ? "#F59E0B"
-                : "#EF4444",
-          }}
-        ></div>
-      </div>
-    </div>
-  );
+  // const renderProgressBar = (value: number, label: string) => (
+  //   <div className="mb-3">
+  //     <div className="flex justify-between mb-1">
+  //       <span className="text-sm font-medium text-gray-700">{label}</span>
+  //       <span className="text-sm font-medium text-gray-700">{value}%</span>
+  //     </div>
+  //     <div className="w-full bg-gray-200 rounded-full h-2.5">
+  //       <div
+  //         className="h-2.5 rounded-full"
+  //         style={{
+  //           width: `${value}%`,
+  //           backgroundColor:
+  //             value > 90
+  //               ? "#10B981"
+  //               : value > 75
+  //               ? "#3B82F6"
+  //               : value > 60
+  //               ? "#F59E0B"
+  //               : "#EF4444",
+  //         }}
+  //       ></div>
+  //     </div>
+  //   </div>
+  // );
 
   // Function to generate and download PDF
   const generatePDF = () => {
@@ -227,7 +220,7 @@ export default function StudentProfilePage() {
     // Student name and basic info
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(16);
-    doc.text(userData.personalInfo.name, margin, 75);
+    doc.text(userData.personalInfo.name || 'N/A', margin, 75);
 
     // Personal Information Section
     let yPosition = 110;
@@ -242,17 +235,12 @@ export default function StudentProfilePage() {
     doc.setFont("helvetica", "normal");
 
     const personalInfoTable = [
-      ["Full Name:", userData.personalInfo.name],
-      ["Email:", userData.personalInfo.email],
-      ["Phone:", userData.personalInfo.phone],
-      // ["School:", userData.personalInfo.school],
-      // ["Grade:", userData.personalInfo.grade],
-      [
-        "Date of Birth:",
-        new Date(userData.personalInfo.dob).toLocaleDateString(),
-      ],
-      ["Gender:", userData.personalInfo.gender],
-      ["Address:", userData.personalInfo.address],
+      ["Full Name:", userData.personalInfo.name || 'N/A'],
+      ["Email:", userData.personalInfo.email || 'N/A'],
+      ["Phone:", userData.personalInfo.phone || 'N/A'],
+      ["Date of Birth:", userData.personalInfo.dob ? new Date(userData.personalInfo.dob).toLocaleDateString() : 'N/A'],
+      ["Gender:", userData.personalInfo.gender || 'N/A'],
+      ["Address:", userData.personalInfo.address || 'N/A'],
     ];
 
     autoTable(doc, {
@@ -526,7 +514,7 @@ export default function StudentProfilePage() {
 
     // Save the PDF
     doc.save(
-      `${userData.personalInfo.name.replace(
+      `${(userData.personalInfo.name || 'Student').replace(
         /\s+/g,
         "_"
       )}_Aptitude_Profile.pdf`
@@ -537,8 +525,8 @@ export default function StudentProfilePage() {
   const getUser = async ()=>{
     try{
       const response = await api.get(API_URL.STUDENT.BASIC)
-      console.log(response.data)
-      const matchedUser = response.data.find((user:any)=>user.id == id)
+      console.log(response.data.results)
+      const matchedUser = response.data.results.find((user:Student)=>user.id === Number(id))
       console.log(matchedUser)
       setUser(matchedUser)
     }catch(error){
@@ -723,7 +711,7 @@ export default function StudentProfilePage() {
                   <div className="flex flex-col">
                     <span className="text-gray-400 text-sm">Date of Birth</span>
                     <span className="text-gray-100">
-                      {new Date(userData.personalInfo.dob).toLocaleDateString()}
+                      {userData.personalInfo.dob ? new Date(userData.personalInfo.dob).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                   <div className="flex flex-col">

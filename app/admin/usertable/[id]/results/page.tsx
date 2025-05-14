@@ -6,12 +6,10 @@ import { toast } from "react-toastify";
 import {
   FiDownload,
   FiBarChart2,
-  FiAward,
   FiBookOpen,
-  FiBook,
   FiArrowLeft,
 } from "react-icons/fi";
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import PsychometricReportPDF from "@/app/user/components/PsychometricReportPDF";
 import { findMatchingCareers } from "@/app/utils/careerMapping";
 import api from "@/app/lib/axios";
@@ -43,12 +41,19 @@ interface TestResult {
   };
 }
 
+interface Student {
+  id: number;
+  student_uuid: string;
+  name: string;
+  email: string;
+  phone: string;
+} 
+
 export default function UserResultsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [results, setResults] = useState<TestResult[] | null>(null);
-  const [showPDF, setShowPDF] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<Student | null>(null);
 
   useEffect(() => {
     fetchUser();
@@ -78,7 +83,9 @@ export default function UserResultsPage() {
   const fetchUser = async () => {
     try {
       const response = await api.get(API_URL.STUDENT.BASIC);
-      const matchedUser = response.data.find((user: any) => user.id == id);
+      const matchedUser = response.data.results.find(
+        (user: Student) => user.id == Number(id)
+      );
       setUser(matchedUser);
       if (matchedUser?.student_uuid) {
         fetchUserResults(matchedUser.student_uuid);
@@ -536,7 +543,7 @@ export default function UserResultsPage() {
                       : "second strongest characteristic";
                   return (
                     <p key={index} className="text-gray-300">
-                      {user?.name}'s {strengthWords} is in the {trait.category}{" "}
+                      {user?.name}&apos;s {strengthWords} is in the {trait.category}{" "}
                       domain, with a score of {trait.score}%. This indicates{" "}
                       {trait.interpretation}.
                     </p>

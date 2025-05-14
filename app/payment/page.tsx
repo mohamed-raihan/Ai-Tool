@@ -7,6 +7,37 @@ import api from "../lib/axios";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 
+// Add this interface at the top of the file, after the imports
+interface RazorpayWindow extends Window {
+  Razorpay: {
+    new(options: any): any;
+  };
+}
+
+// Add these interfaces after the RazorpayWindow interface
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayResponse) => void;
+  prefill: {
+    name: string;
+    email: string;
+  };
+  theme: {
+    color: string;
+  };
+}
+
+interface RazorpayResponse {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+}
+
 const PaymentPage = () => {
   const [form, setForm] = useState({
     email: "",
@@ -49,10 +80,12 @@ const PaymentPage = () => {
     }
 
     // ✅ Ensure Razorpay SDK is loaded
-    if (typeof window === "undefined" || !(window as any).Razorpay) {
+    if (typeof window === "undefined" || !(window as unknown as RazorpayWindow).Razorpay) {
       alert("Razorpay SDK not loaded. Please refresh and try again.");
       return;
     }
+
+    setLoading(true);
 
     try {
       const res = await api.post(API_URL.PAYMENT.CREATE_ORDER, {
@@ -65,14 +98,14 @@ const PaymentPage = () => {
       const order = res.data;
       console.log(order);
       
-      const options: any = {
-        key: order.razorpay_key || process.env.RAZORPAY_KEY_ID,
+      const options: RazorpayOptions = {
+        key: order.razorpay_key || process.env.RAZORPAY_KEY_ID || '',
         amount: order.amount * 100, // ensure amount is in paisa
         currency: "INR",
         name: "Prepacademy",
         description: "Premium Personality Report",
         order_id: order.order_id,
-        handler: async function (response: any) {
+        handler: async function (response: RazorpayResponse) {
           console.log(response);
           await api.post(API_URL.PAYMENT.VERIFY_ORDER, {
             razorpay_payment_id: response.razorpay_payment_id,
@@ -94,11 +127,13 @@ const PaymentPage = () => {
         },
       };
 
-      const rzp = new (window as any).Razorpay(options);
+      const rzp = new (window as unknown as RazorpayWindow).Razorpay(options);
       rzp.open();
     } catch (error) {
       console.error("Payment error:", error);
       alert("Payment failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -36,6 +36,7 @@ const LandingPage = () => {
       // After successful signup, navigate to results
       router.push("/user/dashboard/instructions");
     } catch (error) {
+      console.log(error);
       throw new Error("Failed to sign up. Please try again.");
     }
   };
@@ -54,7 +55,7 @@ const LandingPage = () => {
               Discover Your True Potential
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Only 10 minutes to get a "freakishly accurate" description of who
+              Only 10 minutes to get a &quot;freakishly accurate&quot; description of who
               you are and why you do things the way you do.
             </p>
             <button

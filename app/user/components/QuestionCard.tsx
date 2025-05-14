@@ -40,6 +40,8 @@ const QuestionCard: React.FC<QuestionProps> = ({
   const [testEnded, setTestEnded] = useState(false);
   const router = useRouter();
 
+  console.log("testEnded",testEnded);
+
   const handleTimeUp = () => {
     setTestEnded(true);
     alert("Time's up! Submitting your test...");

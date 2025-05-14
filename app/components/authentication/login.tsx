@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook, FaApple } from "react-icons/fa";
 import { authService } from "@/app/services/auth.service";
 import { toast } from "react-toastify";
 
@@ -18,6 +16,8 @@ export default function Login() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  console.log(isLoggedIn);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -209,7 +209,7 @@ export default function Login() {
 
             <div className="text-center mt-8">
               <p className="text-gray-400">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link
                   href="/signup"
                   className="font-medium text-orange-500 hover:text-orange-400"

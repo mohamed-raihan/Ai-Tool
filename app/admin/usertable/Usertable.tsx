@@ -18,9 +18,25 @@ interface User {
   role: string;
 }
 
+interface Student {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  class_name: { id: number; name: string };
+  stream_name: { id: number; name: string };
+}
+
+interface StudentResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Student[];
+}
+
 interface UsersTableProps {
   users: User[];
-  getStudents: (url?: string) => Promise<any>;
+  getStudents: (url?: string) => Promise<StudentResponse>;
   nextPageUrl: string | null;
   prevPageUrl: string | null;
   totalCount: number;

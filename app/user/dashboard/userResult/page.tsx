@@ -6,12 +6,10 @@ import { toast } from "react-toastify";
 import {
   FiDownload,
   FiBarChart2,
-  FiAward,
   FiBookOpen,
-  FiBook,
   FiArrowLeft,
 } from "react-icons/fi";
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 import { findMatchingCareers } from "@/app/utils/careerMapping";
@@ -43,12 +41,17 @@ interface TestResult {
   };
 }
 
+interface student {
+  name: string;
+  uuid: string;
+  student_uuid: string;
+}
+
 export default function UserResultsPage() {
   const { id } = useParams();
   const router = useRouter();
   const [results, setResults] = useState<TestResult[] | null>(null);
-  const [showPDF, setShowPDF] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<student | null>(null);
 
   useEffect(() => {
     fetchUser();
@@ -79,8 +82,8 @@ export default function UserResultsPage() {
     try {
       const response = await api.get(API_URL.STUDENT.BASIC);
       const student = JSON.parse(localStorage.getItem("student") || "{}");
-      const matchedUser = response.data.find(
-        (user: any) => user.uuid == student.uuid
+      const matchedUser = response.data.results.find(
+        (user: student) => user.uuid == student.uuid
       );
       setUser(matchedUser);
       if (matchedUser?.student_uuid) {
@@ -502,7 +505,7 @@ export default function UserResultsPage() {
                       : "second strongest characteristic";
                   return (
                     <p key={index} className="text-gray-300">
-                      {user?.name}'s {strengthWords} is in the {trait.category}{" "}
+                      {user?.name}&apos;s {strengthWords} is in the {trait.category}{" "}
                       domain, with a score of {trait.score}%. This indicates{" "}
                       {trait.interpretation}.
                     </p>

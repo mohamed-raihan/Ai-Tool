@@ -28,7 +28,7 @@ export default function InstructionsPage() {
             Welcome{studentName ? `, ${studentName}` : ""}!
           </h1>
           <p className="text-lg text-gray-400">
-            Ready to discover your career path? Let's begin your assessment.
+            Ready to discover your career path? Let&apos;s begin your assessment.
           </p>
         </div>
 
@@ -219,7 +219,7 @@ export default function InstructionsPage() {
                   d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              What You'll Get
+              What You&apos;ll Get
             </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">

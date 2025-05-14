@@ -1,6 +1,6 @@
 // pages/dashboard.tsx
 "use client";
-import { act, useState } from "react";
+import {  useState } from "react";
 import { Home, BarChart2, FileText, User } from "lucide-react";
 import type { NextPage } from "next";
 import { useRouter } from "next/navigation";
@@ -30,7 +30,7 @@ interface EmployeeData {
 
 const Dashboard: NextPage = () => {
   const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("home");
-  const router = useRouter();
+  // const router = useRouter();
 
   // Sample employee data
   const employeeData: EmployeeData[] = [

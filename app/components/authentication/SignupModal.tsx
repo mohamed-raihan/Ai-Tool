@@ -2,16 +2,10 @@
 
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
-import {
-  RecaptchaVerifier,
-  signInWithPhoneNumber,
-  PhoneAuthProvider,
-  signInWithCredential,
-} from "firebase/auth";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
-import { FiX, FiUser, FiPhone, FiMail, FiLock } from "react-icons/fi";
+import { FiX, FiUser, FiPhone, FiMail } from "react-icons/fi";
 import {
   initializeRecaptcha,
   sendOTP,
@@ -19,6 +13,17 @@ import {
 } from "../firebase/firebaseApp";
 import { toast } from "react-toastify";
 import { setAuth } from "@/app/lib/auth";
+
+interface Stream {
+  id: string;
+  name: string;
+  class_id: string;
+}
+
+interface Class {
+  id: string;
+  name: string;
+}
 
 interface SignupModalProps {
   isOpen: boolean;
@@ -40,7 +45,6 @@ interface SignupModalProps {
 export default function SignupModal({
   isOpen,
   onClose,
-  onSubmit,
 }: SignupModalProps) {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -60,7 +64,7 @@ export default function SignupModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [classes, setClasses] = useState([]);
-  const [streams, setStreams] = useState([]);
+  // const [streams, setStreams] = useState([]);
   const [filteredStreams, setFilteredStreams] = useState([]);
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
@@ -72,6 +76,9 @@ export default function SignupModal({
   useEffect(() => {
     fetchClasses();
   }, []);
+
+  console.log(isVerifying);
+  
 
   const fetchClasses = async () => {
     try {
@@ -89,10 +96,10 @@ export default function SignupModal({
       console.log(response.data);
       // Filter streams by class_id
       const filtered = response.data.filter(
-        (stream: any) => stream.class_id == classId
+        (stream: Stream) => stream.class_id == classId
       );
       console.log(filtered);
-      setStreams(response.data);
+      // setStreams(response.data);
       setFilteredStreams(filtered);
     } catch (error) {
       console.error("Error fetching streams:", error);
@@ -134,6 +141,7 @@ export default function SignupModal({
 
     setIsVerifying(true);
     setError(null);
+    setSendingOtp(true);
 
     try {
       // Initialize reCAPTCHA
@@ -158,6 +166,7 @@ export default function SignupModal({
       setError("Failed to send OTP. Please try again.");
     } finally {
       setIsVerifying(false);
+      setSendingOtp(false);
     }
   };
 
@@ -170,6 +179,7 @@ export default function SignupModal({
     try {
       setIsVerifying(true);
       setError(null);
+      setVerifyingOtp(true);
 
       // Verify OTP with Firebase
       const result = await verifyOTP(otp);
@@ -195,6 +205,7 @@ export default function SignupModal({
       setError("Verification failed. Please try again.");
     } finally {
       setIsVerifying(false);
+      setVerifyingOtp(false);
     }
   };
 
@@ -314,7 +325,7 @@ export default function SignupModal({
               Signup Successful!
             </h3>
             <p className="text-gray-400 mb-6">
-              Your account has been created. You'll be redirected to your
+              Your account has been created. You&apos;ll be redirected to your
               results shortly.
             </p>
             <div className="w-16 h-1 bg-green-500/30 mx-auto rounded-full mb-6"></div>
@@ -412,7 +423,7 @@ export default function SignupModal({
                       className="w-full pl-3 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
                     >
                       <option value="">Select Class</option>
-                      {classes.map((cls: any) => (
+                      {classes.map((cls: Class) => (
                         <option key={cls.id} value={cls.id}>
                           {cls.name}
                         </option>
@@ -430,7 +441,7 @@ export default function SignupModal({
                       className="w-full pl-3 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
                     >
                       <option value="">Select Stream</option>
-                      {filteredStreams.map((stream: any) => (
+                      {filteredStreams.map((stream: Stream) => (
                         <option key={stream.id} value={stream.id}>
                           {stream.name}
                         </option>

@@ -1,13 +1,11 @@
 "use client";
 
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { authService } from "@/app/services/auth.service";
 import { studentService } from "../../services/student.service";
-import { log } from "console";
 import { toast } from "react-toastify";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
@@ -75,7 +73,6 @@ export default function SignupForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState<FormStep>("basic");
   const [accessToken, setAccessToken] = useState<string>("");
-  const [studentId, setStudentId] = useState<number | null>(null);
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [streams, setStreams] = useState<Stream[]>([]);
   const [formData, setFormData] = useState<FormData>({
@@ -121,6 +118,8 @@ export default function SignupForm() {
     },
   });
 
+  console.log(accessToken);
+   
   const fetchClasses = async () => {
     try {
       const response = await api.get(API_URL.STUDYING.GET_CLASSES);

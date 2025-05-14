@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Home, Users, FilePlus } from "lucide-react";
 import type { NextPage } from "next";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import TestPage from "@/app/user/dashboard/test/page";
 // import UsersTable from "../usertable/Usertable";

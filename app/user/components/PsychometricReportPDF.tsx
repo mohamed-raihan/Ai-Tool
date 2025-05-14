@@ -7,10 +7,8 @@ import {
   Document,
   StyleSheet,
   Font,
-  PDFViewer,
 } from "@react-pdf/renderer";
 import {
-  generateConciseSummary,
   findMatchingCareers,
 } from "@/app/utils/careerMapping";
 
@@ -59,15 +57,15 @@ interface Assessment {
   style?: string;
 }
 
-interface UserData {
-  personalInfo: PersonalInfo;
-  aptitudeResults: AptitudeResults;
-  recommendedFields: RecommendedField[];
-  educationInterests: EducationInterest[];
-  familyBackground: FamilyBackground;
-  achievements: string[];
-  assessmentHistory: Assessment[];
-}
+// interface UserData {
+//   personalInfo: PersonalInfo;
+//   aptitudeResults: AptitudeResults;
+//   recommendedFields: RecommendedField[];
+//   educationInterests: EducationInterest[];
+//   familyBackground: FamilyBackground;
+//   achievements: string[];
+//   assessmentHistory: Assessment[];
+// }
 
 interface CareerRecommendation {
   id: string;
@@ -388,14 +386,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const defaultScores = [
-  { category: "Realistic", score: 0 },
-  { category: "Investigative", score: 0 },
-  { category: "Artistic", score: 50 },
-  { category: "Social", score: 100 },
-  { category: "Enterprising", score: 0 },
-  { category: "Conventional", score: 0 },
-];
+// const defaultScores = [
+//   { category: "Realistic", score: 0 },
+//   { category: "Investigative", score: 0 },
+//   { category: "Artistic", score: 50 },
+//   { category: "Social", score: 100 },
+//   { category: "Enterprising", score: 0 },
+//   { category: "Conventional", score: 0 },
+// ];
 
 interface PsychometricReportPDFProps {
   userData: {
@@ -451,11 +449,11 @@ interface PsychometricReportPDFProps {
 const PsychometricReportPDF: React.FC<PsychometricReportPDFProps> = ({
   userData,
 }) => {
-  const getProgressBarStyle = (score: number) => {
-    if (score <= 30) return styles.progressBarLow;
-    if (score <= 70) return styles.progressBarModerate;
-    return styles.progressBarHigh;
-  };
+  // const getProgressBarStyle = (score: number) => {
+  //   if (score <= 30) return styles.progressBarLow;
+  //   if (score <= 70) return styles.progressBarModerate;
+  //   return styles.progressBarHigh;
+  // };
 
   // Get top two interests based on scores
   const topInterests = [...userData.scores]

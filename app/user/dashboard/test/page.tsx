@@ -10,8 +10,6 @@ import {
 import { toast } from "react-toastify";
 import TestTimer from "./timer/page";
 import { calculateScores } from "../report/page";
-import QuestionCard from "../../components/QuestionCard";
-import SignupModal from "../../../components/authentication/SignupModal";
 import { PersonalityService } from "../../../services/personality.service";
 import { Answer } from "../../../types/test";
 
@@ -30,7 +28,7 @@ export default function TestPage() {
   const [currentPage, setCurrentPage] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const QUESTIONS_PER_PAGE = 7;
 
   useEffect(() => {
@@ -50,6 +48,7 @@ export default function TestPage() {
       }));
       setQuestions(questionsWithOptions);
     } catch (error) {
+      console.log("error",error);
       toast.error("Failed to fetch questions");
     } finally {
       setLoading(false);
@@ -136,11 +135,11 @@ export default function TestPage() {
     }
   };
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
+  // const handlePreviousPage = () => {
+  //   if (currentPage > 0) {
+  //     setCurrentPage(currentPage - 1);
+  //   }
+  // };
 
   const handleTimeUp = () => {
     toast.warning("Time is up! Submitting your test...");

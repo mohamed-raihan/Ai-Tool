@@ -229,8 +229,8 @@ export default function PercentageCalculatorPage() {
           <p className="text-gray-700 text-justify dark:text-gray-300 text-lg mb-2">
             Enter the name, letter grade and credit hours (usually 1) for each
             of your classes, beginning with your first semester or year in high
-            school. If you're taking weighted classes (Honors, AP/IB or
-            College), switch the 'weighted' toggle on to account for their
+            school. If you&apos;re taking weighted classes (Honors, AP/IB or
+            College), switch the &apos;weighted&apos; toggle on to account for their
             difficulty.
             <br />
             <br />

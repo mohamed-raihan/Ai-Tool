@@ -1,5 +1,3 @@
-import api from "../lib/axios";
-import { API_URL } from "../services/api_url";
 import { careerService } from "../services/careers.service";
 
 interface CareerPath {
@@ -250,24 +248,24 @@ export const careerPaths: CareerPath[] = [
 
 let careerPathsData: CareerPath[] = careerPaths;
 
-const fetchCareerPaths = async () => {
-  try {
-    const res = await careerService.getCareers();
-    console.log(res);
-    if (res && res.length > 0) {
-      careerPathsData = res.map((career: any) => ({
-        id: career.id,
-        name: career.name,
-        description: career.description,
-        education_pathway: career.education_pathway,
-        traits: career.traits,
-        score: career.score || "70",
-      }));
-    }
-  } catch (error) {
-    console.error("Error fetching career paths:", error);
-  }
-};
+// const fetchCareerPaths = async () => {
+//   try {
+//     const res = await careerService.getCareers();
+//     console.log(res);
+//     if (res && res.length > 0) {
+//       careerPathsData = res.map((career: any) => ({
+//         id: career.id,
+//         name: career.name,
+//         description: career.description,
+//         education_pathway: career.education_pathway,
+//         traits: career.traits,
+//         score: career.score || "70",
+//       }));
+//     }
+//   } catch (error) {
+//     console.error("Error fetching career paths:", error);
+//   }
+// };
 
 // Fetch career paths on module load
 // fetchCareerPaths();

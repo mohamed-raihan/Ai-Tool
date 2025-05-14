@@ -3,27 +3,35 @@
 import React, { useEffect, useState } from "react";
 import {
   FiUser,
-  FiMail,
   FiPhone,
   FiMapPin,
   FiCalendar,
-  FiAward,
   FiUsers,
   FiBook,
-  FiHeart,
-  FiBriefcase,
-  FiBarChart2,
   FiTarget,
-  FiCpu,
-  FiLayers,
-  FiPieChart,
 } from "react-icons/fi";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 import ProtectedRoute from "@/app/components/ProtectedRoute";
 
+interface Student {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  dob: string;
+  gender: string;
+  address: string;
+  studying_in: string;
+  specification: string;
+  college: string;
+  course: string;
+  passing_year: string;
+  university: string;
+}
+
 export default function StudentProfilePage() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
 
   const getUser = async () => {
@@ -31,8 +39,8 @@ export default function StudentProfilePage() {
       const response = await api.get(API_URL.STUDENT.BASIC);
       const studentId = JSON.parse(localStorage.getItem("user") || "{}").id;
       if (studentId) {
-        const matchedUser = response.data.find(
-          (user: any) => user.id === studentId
+        const matchedUser = response.data.results.find(
+          (user: Student) => user.id === studentId
         );
         setUser(matchedUser);
       }

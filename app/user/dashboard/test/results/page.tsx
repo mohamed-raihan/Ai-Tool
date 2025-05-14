@@ -5,15 +5,12 @@ import { toast } from "react-toastify";
 import {
   FiDownload,
   FiBarChart2,
-  FiAward,
   FiBookOpen,
-  FiBook,
 } from "react-icons/fi";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
 import PsychometricReportPDF from "@/app/user/components/PsychometricReportPDF";
 import { findMatchingCareers } from "@/app/utils/careerMapping";
 import {
-  PersonalityService,
   PersonalityTraitResult,
 } from "@/app/services/personality.service";
 import Image from "next/image";
@@ -210,17 +207,17 @@ const ResultsPage = () => {
     };
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-emerald-600";
-    if (score >= 60) return "text-sky-600";
-    return "text-amber-600";
-  };
+  // const getScoreColor = (score: number) => {
+  //   if (score >= 80) return "text-emerald-600";
+  //   if (score >= 60) return "text-sky-600";
+  //   return "text-amber-600";
+  // };
 
-  const getProgressBarColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-500";
-    if (score >= 60) return "bg-sky-500";
-    return "bg-amber-500";
-  };
+  // const getProgressBarColor = (score: number) => {
+  //   if (score >= 80) return "bg-emerald-500";
+  //   if (score >= 60) return "bg-sky-500";
+  //   return "bg-amber-500";
+  // };
 
   const getRecommendedFields = (
     scores: Array<{ category: string; score: number }>
@@ -261,7 +258,7 @@ const ResultsPage = () => {
             No Results Found
           </h2>
           <p className="text-gray-400 mb-4">
-            All questions were answered as "No". Please retake the test and
+            All questions were answered as &quot;No&quot;. Please retake the test and
             provide more varied responses for accurate results.
           </p>
           <Link
@@ -278,6 +275,7 @@ const ResultsPage = () => {
   const userData = formatUserData(results);
   console.log(userData);
   const recommendedFields = getRecommendedFields(results.scores);
+  console.log(recommendedFields);
 
   return (
     <div className="min-h-screen bg-gray-900 py-10 px-4">
@@ -299,13 +297,13 @@ const ResultsPage = () => {
         </div>
 
         {/* PDF Preview */}
-        {showPDF && (
+        {/* {showPDF && (
           <div className="h-[600px] mb-6">
             <PDFViewer className="w-full h-full">
               <PsychometricReportPDF userData={userData} />
             </PDFViewer>
           </div>
-        )}
+        )} */}
 
         {/* Results Content */}
         <div className="bg-gray-800 rounded-lg shadow-xl p-6 border border-gray-700">
@@ -847,7 +845,7 @@ const ResultsPage = () => {
                 UNLOCK NOW
               </span>
               <h2 className="text-3xl font-bold text-white mb-2">
-                Your story isn't complete yet
+                Your story isn&apos;t complete yet
               </h2>
               <p className="text-gray-300 mb-4 text-lg">
                 Dive deeper into your unique traits like perfectionism,
