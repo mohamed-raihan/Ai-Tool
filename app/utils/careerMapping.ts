@@ -1,4 +1,16 @@
-import { careerService } from "../services/careers.service";
+import {
+  careerService,
+  Career as ServiceCareer,
+} from "../services/careers.service";
+
+interface Career {
+  id: string | undefined;
+  name: string;
+  description: string;
+  education_pathway: string[];
+  traits: string[];
+  score: string;
+}
 
 interface CareerPath {
   id: string;
@@ -225,7 +237,7 @@ export const careerPaths: CareerPath[] = [
       "Provides advanced healthcare services, including diagnosis and treatment, often acting as a primary care provider.",
     education_pathway: [
       "Bachelor of Science in Nursing (BSN)",
-      "Master’s in Nursing (MSN) or DNP",
+      "Master's in Nursing (MSN) or DNP",
       "State Licensure and Clinical Training",
     ],
     traits: ["Organized", "Patient", "Problem Solving", "Social"],
@@ -253,8 +265,8 @@ const fetchCareerPaths = async () => {
     const res = await careerService.getCareers();
     console.log(res);
     if (res && res.length > 10) {
-      careerPathsData = res.map((career: any) => ({
-        id: career.id,
+      careerPathsData = res.map((career: ServiceCareer) => ({
+        id: career.id?.toString() || "",
         name: career.name,
         description: career.description,
         education_pathway: career.education_pathway,
