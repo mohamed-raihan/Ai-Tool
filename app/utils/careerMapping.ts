@@ -292,15 +292,15 @@ export function findMatchingCareers(
       })
     );
 
-    console.log(matchingTraits);
+    // console.log(matchingTraits);
 
-    console.log(
-      `Career: ${career.name}, Matching traits: ${matchingTraits.length}`
-    );
+    // console.log(
+    //   `Career: ${career.name}, Matching traits: ${matchingTraits.length}`
+    // );
     return matchingTraits.length >= 1;
   });
 
-  console.log(matchingCareers);
+  // console.log(matchingCareers);
 
   const results = matchingCareers
     .map((career) => ({

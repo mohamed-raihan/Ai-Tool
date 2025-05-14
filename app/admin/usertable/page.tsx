@@ -23,28 +23,42 @@ const sampleUsers = [
   },
 ];
 
-
 export default function AdminUsersPage() {
   const [students, setStudents] = useState<any[]>([]);
-  const getStudents = async ()=>{
-    try{
-      const response = await api.get(API_URL.STUDENT.BASIC)
-      setStudents(response.data.results)
-      console.log(response.data)
-      return response.data
-    }catch(error){
-      console.log(error)
+  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
+  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  const getStudents = async (url?: string) => {
+    try {
+      const response = await api.get(url || API_URL.STUDENT.BASIC);
+      setStudents(response.data.results);
+      setNextPageUrl(response.data.next);
+      setPrevPageUrl(response.data.previous);
+      setTotalCount(response.data.count);
+      return response.data;
+    } catch (error) {
+      console.log(error);
     }
-  }
-  
-  useEffect(()=>{
-    getStudents()
-  },[])
+  };
+
+  useEffect(() => {
+    getStudents();
+  }, []);
 
   return (
-    <div className="h-[100vh] ">
+    <div className="h-[100vh]">
       {/* <h1 className="text-2xl font-bold mb-4 text-white">All Users</h1> */}
-      <UsersTable getStudents={getStudents} users={students.length > 0 ? students : sampleUsers} />
+      <UsersTable
+        getStudents={getStudents}
+        users={students.length > 0 ? students : sampleUsers}
+        nextPageUrl={nextPageUrl}
+        prevPageUrl={prevPageUrl}
+        totalCount={totalCount}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 }

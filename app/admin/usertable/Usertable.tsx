@@ -20,10 +20,23 @@ interface User {
 
 interface UsersTableProps {
   users: User[];
-  getStudents: () => Promise<any>;
+  getStudents: (url?: string) => Promise<any>;
+  nextPageUrl: string | null;
+  prevPageUrl: string | null;
+  totalCount: number;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
 }
 
-export default function UsersTable({ users, getStudents }: UsersTableProps) {
+export default function UsersTable({
+  users,
+  getStudents,
+  nextPageUrl,
+  prevPageUrl,
+  totalCount,
+  currentPage,
+  setCurrentPage,
+}: UsersTableProps) {
   const router = useRouter();
 
   console.log(users);
@@ -72,14 +85,14 @@ export default function UsersTable({ users, getStudents }: UsersTableProps) {
             <div className="bg-gray-800 rounded-lg px-3 py-2 flex items-center">
               <span className="text-gray-400 mr-2">Total Users:</span>
               <span className="text-orange-500 font-semibold">
-                {users.length}
+                {totalCount}
               </span>
             </div>
           </div>
         </div>
 
         <div className="bg-gray-800 rounded-lg shadow-xl">
-          <div className="h-[70vh] overflow-auto">
+          <div className="h-[70vh] overflow-auto custom-scrollbar">
             <div className="inline-block min-w-full">
               <div className="overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-700">
@@ -203,8 +216,128 @@ export default function UsersTable({ users, getStudents }: UsersTableProps) {
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          <div className="px-4 py-3 flex items-center justify-between border-t border-gray-700">
+            <div className="flex-1 flex justify-between sm:hidden">
+              <button
+                onClick={() => {
+                  if (prevPageUrl) {
+                    getStudents(prevPageUrl);
+                    setCurrentPage(currentPage - 1);
+                  }
+                }}
+                disabled={!prevPageUrl}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => {
+                  if (nextPageUrl) {
+                    getStudents(nextPageUrl);
+                    setCurrentPage(currentPage + 1);
+                  }
+                }}
+                disabled={!nextPageUrl}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Next
+              </button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-400">
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + 1}
+                  </span>{" "}
+                  to{" "}
+                  <span className="font-medium">
+                    {Math.min(currentPage * 10, totalCount)}
+                  </span>{" "}
+                  of <span className="font-medium">{totalCount}</span> results
+                </p>
+              </div>
+              <div>
+                <nav
+                  className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                  aria-label="Pagination"
+                >
+                  <button
+                    onClick={() => {
+                      if (prevPageUrl) {
+                        getStudents(prevPageUrl);
+                        setCurrentPage(currentPage - 1);
+                      }
+                    }}
+                    disabled={!prevPageUrl}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  {[...Array(Math.ceil(totalCount / 10))].map((_, index) => (
+                    <button
+                      key={index + 1}
+                      onClick={() => {
+                        const pageUrl = `${API_URL.STUDENT.BASIC}?page=${
+                          index + 1
+                        }`;
+                        getStudents(pageUrl);
+                        setCurrentPage(index + 1);
+                      }}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium ${
+                        currentPage === index + 1
+                          ? "z-10 bg-orange-500 border-orange-500 text-white"
+                          : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      if (nextPageUrl) {
+                        getStudents(nextPageUrl);
+                        setCurrentPage(currentPage + 1);
+                      }
+                    }}
+                    disabled={!nextPageUrl}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(31, 41, 55, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* For Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) rgba(31, 41, 55, 0.5);
+        }
+      `}</style>
     </div>
   );
 }

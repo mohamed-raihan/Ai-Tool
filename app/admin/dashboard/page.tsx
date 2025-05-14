@@ -55,6 +55,7 @@ const Dashboard: NextPage = () => {
   const fetchStudents = async (url?: string) => {
     try {
       const respons = await api.get(url || API_URL.STUDENT.BASIC);
+      console.log(respons.data);
       setStudents(respons.data.results);
       setNextPageUrl(respons.data.next);
       setPrevPageUrl(respons.data.previous);
@@ -325,7 +326,7 @@ const Dashboard: NextPage = () => {
               </div>
 
               <div className="overflow-x-auto flex-1 min-h-0">
-                <div className="h-[55vh] overflow-y-auto rounded">
+                <div className="h-[55vh] overflow-y-auto rounded custom-scrollbar">
                   <table className="min-w-full divide-y divide-gray-700/50">
                     <thead>
                       <tr className="text-xs text-gray-400 bg-gray-900/50">
@@ -399,11 +400,11 @@ const Dashboard: NextPage = () => {
               </h2>
 
               <div className="space-y-2 flex-1 min-h-0">
-                <div className="h-[70vh] overflow-y-auto rounded">
+                <div className="h-[70vh] overflow-y-auto rounded custom-scrollbar px-2">
                   {studentData.map((student, idx) => (
                     <div
                       key={idx}
-                      className="bg-gray-800/50 backdrop-blur-sm p-3 rounded-md border border-gray-700/50 hover:bg-gray-700/50 transition-colors"
+                      className="bg-gray-800/50 backdrop-blur-sm p-3 rounded-md border border-gray-700/50 hover:bg-gray-700/50 transition-colors my-2"
                     >
                       <div className="flex justify-between items-center mb-2">
                         <div className="text-white font-medium">
@@ -488,6 +489,32 @@ const Dashboard: NextPage = () => {
           <ReportPage />
         </div>
       )}
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(31, 41, 55, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* For Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) rgba(31, 41, 55, 0.5);
+        }
+      `}</style>
     </div>
   );
 };

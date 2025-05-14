@@ -51,26 +51,25 @@ export default function ReportPage() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
+  const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Calculate pagination
-  const totalPages = Math.ceil(filteredStudents.length);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentStudents = filteredStudents.slice(startIndex, endIndex);
+  // useEffect(() => {
+  //   fetchStudentReports();
+  // }, []);
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  useEffect(() => {
-    fetchStudentReports();
-  }, []);
-
-  const fetchStudentReports = async () => {
+  const fetchStudentReports = async (url?: string) => {
     try {
-      const response = await api.get(API_URL.STUDENT.BASIC);
-      console.log(response.data);
+      const response = await api.get(url || API_URL.STUDENT.BASIC);
+      console.log("API Response:", response.data);
+
+      // Update pagination state
+      setPrevPageUrl(response.data.previous);
+      setNextPageUrl(response.data.next);
+      setTotalCount(response.data.count);
+
       const studentData = response.data.results;
 
       // Fetch test results for each student
@@ -80,9 +79,7 @@ export default function ReportPage() {
             const resultResponse = await api.get(
               API_URL.RESULT.GET_RESULT(student.student_uuid)
             );
-            console.log(resultResponse);
             const testResult = resultResponse.data[0];
-            console.log(testResult);
 
             return {
               id: student.id,
@@ -111,17 +108,26 @@ export default function ReportPage() {
         })
       );
 
-      console.log(reports);
-
       const validReports = reports.filter((report) => report !== null);
       setStudents(validReports);
       setFilteredStudents(validReports);
+
+      // Update current page based on the URL
+      if (url) {
+        const pageMatch = url.match(/page=(\d+)/);
+        if (pageMatch) {
+          setCurrentPage(parseInt(pageMatch[1]));
+        }
+      } else {
+        setCurrentPage(1);
+      }
     } catch (error) {
       console.error("Error fetching student reports:", error);
     }
   };
 
   console.log(students);
+  console.log(filteredStudents);
 
   const handleDateFilter = () => {
     let filtered = [...students];
@@ -204,6 +210,7 @@ export default function ReportPage() {
 
   useEffect(() => {
     handleDateFilter();
+    fetchStudentReports();
   }, [dateRange, searchTerm]);
 
   return (
@@ -252,7 +259,7 @@ export default function ReportPage() {
         </div>
 
         <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden">
-          <div className="overflow-x-auto h-[70vh] overflow-y-auto">
+          <div className="overflow-x-auto h-[70vh] overflow-y-auto custom-scrollbar">
             <table className="min-w-full divide-y divide-gray-700 text-sm">
               <thead className="bg-gray-900 sticky top-0 z-10">
                 <tr>
@@ -277,7 +284,7 @@ export default function ReportPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {currentStudents.map((student) => (
+                {filteredStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-700">
                     <td className="px-6 py-4">
                       <div className="text-sm text-white">
@@ -385,15 +392,23 @@ export default function ReportPage() {
           <div className="px-4 py-3 flex items-center justify-between border-t border-gray-700">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+                onClick={() => {
+                  if (prevPageUrl) {
+                    fetchStudentReports(prevPageUrl);
+                  }
+                }}
+                disabled={!prevPageUrl}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
               <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
+                onClick={() => {
+                  if (nextPageUrl) {
+                    fetchStudentReports(nextPageUrl);
+                  }
+                }}
+                disabled={!nextPageUrl}
                 className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
@@ -402,14 +417,15 @@ export default function ReportPage() {
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-400">
-                  Showing <span className="font-medium">{startIndex + 1}</span>{" "}
+                  Showing{" "}
+                  <span className="font-medium">
+                    {(currentPage - 1) * 10 + 1}
+                  </span>{" "}
                   to{" "}
                   <span className="font-medium">
-                    {Math.min(endIndex, filteredStudents.length)}
+                    {Math.min(currentPage * 10, totalCount)}
                   </span>{" "}
-                  of{" "}
-                  <span className="font-medium">{filteredStudents.length}</span>{" "}
-                  results
+                  of <span className="font-medium">{totalCount}</span> results
                 </p>
               </div>
               <div>
@@ -418,16 +434,25 @@ export default function ReportPage() {
                   aria-label="Pagination"
                 >
                   <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    onClick={() => {
+                      if (prevPageUrl) {
+                        fetchStudentReports(prevPageUrl);
+                      }
+                    }}
+                    disabled={!prevPageUrl}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
-                  {[...Array(totalPages)].map((_, index) => (
+                  {[...Array(Math.ceil(totalCount / 10))].map((_, index) => (
                     <button
                       key={index + 1}
-                      onClick={() => handlePageChange(index + 1)}
+                      onClick={() => {
+                        const pageUrl = `${API_URL.STUDENT.BASIC}?page=${
+                          index + 1
+                        }`;
+                        fetchStudentReports(pageUrl);
+                      }}
                       className={`relative inline-flex items-center px-4 py-2 border border-gray-700 text-sm font-medium ${
                         currentPage === index + 1
                           ? "z-10 bg-orange-500 border-orange-500 text-white"
@@ -438,8 +463,12 @@ export default function ReportPage() {
                     </button>
                   ))}
                   <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    onClick={() => {
+                      if (nextPageUrl) {
+                        fetchStudentReports(nextPageUrl);
+                      }
+                    }}
+                    disabled={!nextPageUrl}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
@@ -450,6 +479,32 @@ export default function ReportPage() {
           </div>
         </div>
       </div>
+
+      <style jsx global>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(31, 41, 55, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.5);
+          border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.7);
+        }
+
+        /* For Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.5) rgba(31, 41, 55, 0.5);
+        }
+      `}</style>
     </div>
   );
 }
