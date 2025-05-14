@@ -3,14 +3,14 @@ import {
   Career as ServiceCareer,
 } from "../services/careers.service";
 
-interface Career {
-  id: string | undefined;
-  name: string;
-  description: string;
-  education_pathway: string[];
-  traits: string[];
-  score: string;
-}
+// interface Career {
+//   id: string | undefined;
+//   name: string;
+//   description: string;
+//   education_pathway: string[];
+//   traits: string[];
+//   score: string;
+// }
 
 interface CareerPath {
   id: string;
