@@ -29,6 +29,7 @@ export default function CategoryManagement() {
   const [newCategory, setNewCategory] = useState("");
   const [newClass, setNewClass] = useState("");
   const [newStream, setNewStream] = useState("");
+  const [selectedClassId, setSelectedClassId] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -91,13 +92,19 @@ export default function CategoryManagement() {
   };
 
   const handleAddStream = async () => {
+    if (!selectedClassId) {
+      alert("Please select a class");
+      return;
+    }
     try {
       const response = await api.post(API_URL.ADMIN.STREAM, {
         name: newStream,
+        class_id: selectedClassId,
       });
       console.log(response.data);
       fetchStreams();
       setNewStream("");
+      setSelectedClassId("");
     } catch (error) {
       console.error("Error adding stream:", error);
     }
@@ -132,7 +139,6 @@ export default function CategoryManagement() {
       console.error("Error deleting stream:", error);
     }
   };
-  
 
   if (loading) {
     return (
@@ -205,6 +211,18 @@ export default function CategoryManagement() {
               Add Stream
             </h2>
             <div className="space-y-4">
+              <select
+                value={selectedClassId}
+                onChange={(e) => setSelectedClassId(e.target.value)}
+                className="w-full p-3 bg-gray-700 text-gray-100 border border-gray-600 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+              >
+                <option value="">Select a Class</option>
+                {classes.map((cls) => (
+                  <option key={cls.id} value={cls.id}>
+                    {cls.name}
+                  </option>
+                ))}
+              </select>
               <input
                 type="text"
                 value={newStream}
@@ -245,10 +263,13 @@ export default function CategoryManagement() {
                 >
                   <span className="text-gray-100">{category.name}</span>
                   <div className="flex gap-3">
-                    <button  className="text-orange-500 hover:text-orange-400 transition-colors">
+                    <button className="text-orange-500 hover:text-orange-400 transition-colors">
                       <Edit2 size={18} />
                     </button>
-                    <button onClick={() => handleDeleteCategory(category.id)} className="text-red-500 hover:text-red-400 transition-colors">
+                    <button
+                      onClick={() => handleDeleteCategory(category.id)}
+                      className="text-red-500 hover:text-red-400 transition-colors"
+                    >
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -280,7 +301,10 @@ export default function CategoryManagement() {
                     <button className="text-orange-500 hover:text-orange-400 transition-colors">
                       <Edit2 size={18} />
                     </button>
-                    <button onClick={() => handleDeleteClass(cls.id)} className="text-red-500 hover:text-red-400 transition-colors">
+                    <button
+                      onClick={() => handleDeleteClass(cls.id)}
+                      className="text-red-500 hover:text-red-400 transition-colors"
+                    >
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -312,7 +336,10 @@ export default function CategoryManagement() {
                     <button className="text-orange-500 hover:text-orange-400 transition-colors">
                       <Edit2 size={18} />
                     </button>
-                    <button onClick={() => handleDeleteStream(stream.id)} className="text-red-500 hover:text-red-400 transition-colors">
+                    <button
+                      onClick={() => handleDeleteStream(stream.id)}
+                      className="text-red-500 hover:text-red-400 transition-colors"
+                    >
                       <Trash2 size={18} />
                     </button>
                   </div>

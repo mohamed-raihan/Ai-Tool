@@ -42,10 +42,7 @@ interface SignupModalProps {
   }) => Promise<void>;
 }
 
-export default function SignupModal({
-  isOpen,
-  onClose,
-}: SignupModalProps) {
+export default function SignupModal({ isOpen, onClose }: SignupModalProps) {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -78,7 +75,6 @@ export default function SignupModal({
   }, []);
 
   console.log(isVerifying);
-  
 
   const fetchClasses = async () => {
     try {
@@ -213,6 +209,17 @@ export default function SignupModal({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
+
+    if (name === "dob") {
+      const selectedDate = new Date(value);
+      const cutoffDate = new Date("2013-01-01");
+
+      if (selectedDate >= cutoffDate) {
+        setError("Date of birth must be before 2013");
+        return;
+      }
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -407,6 +414,7 @@ export default function SignupModal({
                       value={formData.dob}
                       onChange={handleChange}
                       required
+                      max="2012-12-31"
                       className="w-full pl-3 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
                     />
                   </div>
@@ -450,7 +458,7 @@ export default function SignupModal({
                   </div>
                 </div>
                 {/* Address Input */}
-                <div className="relative">
+                {/* <div className="relative">
                   <input
                     type="text"
                     id="address"
@@ -461,7 +469,7 @@ export default function SignupModal({
                     required
                     className="w-full pl-3 pr-4 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-colors"
                   />
-                </div>
+                </div> */}
 
                 {/* Email Input */}
                 <div className="relative">
@@ -599,7 +607,7 @@ export default function SignupModal({
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !phoneVerified}
                   className="w-full py-3 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
                   {loading ? (

@@ -156,80 +156,99 @@ export default function UsersTable({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-700 bg-gray-800 overflow-y-auto">
-                    {users.map((user, index) => (
-                      <tr
-                        key={user.id}
-                        className={`hover:bg-gray-700/50 transition-colors ${
-                          index % 2 === 0 ? "bg-gray-800" : "bg-gray-800/50"
-                        }`}
-                      >
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="flex-shrink-0 h-10 w-10">
-                              <div className="h-10 w-10 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center font-semibold">
-                                {user.name.charAt(0).toUpperCase()}
-                              </div>
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-200">
-                                {user.name}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-300">
-                            {user.email}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-300">
-                            {user.phone}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
-                          >
-                            {user.class_name?.name}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
-                          >
-                            {user.stream_name?.name}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex space-x-2 justify-center">
-                            <button
-                              onClick={() => handleProfileClick(user.id)}
-                              className="text-orange-500 hover:text-orange-400 bg-orange-500/10 px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <PiStudentBold size={20} />
-                            </button>
-                            <button
-                              onClick={() => handleResultsClick(user.id)}
-                              className="text-blue-500 hover:text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <BiSolidReport size={20} />
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleDelete(
-                                  user.student_uuid,
-                                  user.firebase_user_id
-                                )
-                              }
-                              className="text-red-500 hover:text-red-400 bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <FaRegTrashAlt size={20} />
-                            </button>
+                    {users.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-400">
+                            <PiStudentBold
+                              size={48}
+                              className="mb-4 opacity-50"
+                            />
+                            <p className="text-lg font-medium">
+                              No Users Found
+                            </p>
+                            <p className="text-sm mt-1">
+                              There are no users in the system at the moment.
+                            </p>
                           </div>
                         </td>
                       </tr>
-                    ))}
+                    ) : (
+                      users.map((user, index) => (
+                        <tr
+                          key={user.id}
+                          className={`hover:bg-gray-700/50 transition-colors ${
+                            index % 2 === 0 ? "bg-gray-800" : "bg-gray-800/50"
+                          }`}
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="flex-shrink-0 h-10 w-10">
+                                <div className="h-10 w-10 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center font-semibold">
+                                  {user.name.charAt(0).toUpperCase()}
+                                </div>
+                              </div>
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-200">
+                                  {user.name}
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-300">
+                              {user.email}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-300">
+                              {user.phone}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
+                            >
+                              {user.class_name?.name}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full`}
+                            >
+                              {user.stream_name?.name}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex space-x-2 justify-center">
+                              <button
+                                onClick={() => handleProfileClick(user.id)}
+                                className="text-orange-500 hover:text-orange-400 bg-orange-500/10 px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <PiStudentBold size={20} />
+                              </button>
+                              <button
+                                onClick={() => handleResultsClick(user.id)}
+                                className="text-blue-500 hover:text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <BiSolidReport size={20} />
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleDelete(
+                                    user.student_uuid,
+                                    user.firebase_user_id
+                                  )
+                                }
+                                className="text-red-500 hover:text-red-400 bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
+                              >
+                                <FaRegTrashAlt size={20} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>

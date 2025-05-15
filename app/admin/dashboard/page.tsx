@@ -18,6 +18,7 @@ import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 import { TbReport } from "react-icons/tb";
 import ReportPage from "../report/page";
+import { FiSearch } from "react-icons/fi";
 
 // Define types for our component
 type MenuItem = string;
@@ -44,7 +45,7 @@ interface Student {
 }
 
 const Dashboard: NextPage = () => {
-  const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("");
+  const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("home");
   // const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
@@ -59,7 +60,7 @@ const Dashboard: NextPage = () => {
       const respons = await api.get(url || API_URL.STUDENT.BASIC);
       console.log(respons.data);
 
-      const filterSubscribedStudents = respons.data.results.filter(
+      const filterSubscribedStudents = respons.data?.results?.filter(
         (student: Student) => student?.is_subscribed === true
       );
       setSubscribedCount(filterSubscribedStudents?.length);
@@ -361,25 +362,36 @@ const Dashboard: NextPage = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-700/50">
-                      {studentData.map((student, index) => (
-                        <tr
-                          key={index}
-                          className="text-sm hover:bg-gray-700/50 transition-colors"
-                        >
-                          <td className="px-4 py-2">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium">
-                                {student.name.charAt(0).toUpperCase()}
+                      {studentData?.length == 0 ? (
+                        <tr>
+                        <td colSpan={6} className="px-6 py-8 text-center">
+                          <div className="flex flex-col items-center justify-center text-gray-400">
+                            <FiSearch size={48} className="mb-4 opacity-50" />
+                            <p className="text-lg font-medium">No Students Found</p>
+                          </div>
+                        </td>
+                      </tr>
+                      ) : (
+                        studentData?.map((student, index) => (
+                          <tr
+                            key={index}
+                            className="text-sm hover:bg-gray-700/50 transition-colors"
+                          >
+                            <td className="px-4 py-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-white font-medium">
+                                  {student.name.charAt(0).toUpperCase()}
+                                </div>
+                                <span>{student.name}</span>
                               </div>
-                              <span>{student.name}</span>
-                            </div>
-                          </td>
-                          <td className="px-4 py-2">{student.Email}</td>
-                          <td className="px-4 py-2">{student.Phone}</td>
-                          <td className="px-4 py-2">{student.Class}</td>
-                          <td className="px-4 py-2">{student.Stream}</td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="px-4 py-2">{student.Email}</td>
+                            <td className="px-4 py-2">{student.Phone}</td>
+                            <td className="px-4 py-2">{student.Class}</td>
+                            <td className="px-4 py-2">{student.Stream}</td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>

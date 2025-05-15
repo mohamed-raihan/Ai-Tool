@@ -88,7 +88,6 @@ export default function ReportPage() {
             );
             const testResult = resultResponse.data[0];
             console.log(testResult);
-            
 
             return {
               id: student.id,
@@ -118,7 +117,6 @@ export default function ReportPage() {
       );
 
       console.log(reports);
-      
 
       const validReports = reports.filter((report) => report !== null);
       setStudents(validReports);
@@ -137,7 +135,7 @@ export default function ReportPage() {
       console.error("Error fetching student reports:", error);
     }
   };
-  
+
   console.log(students);
   console.log(filteredStudents);
 
@@ -296,107 +294,121 @@ export default function ReportPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-700">
-                {filteredStudents.map((student) => (
-                  <tr key={student.id} className="hover:bg-gray-700">
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-white">
-                        <div className="font-medium">{student.name}</div>
-                        <div className="text-gray-400">{student.email}</div>
-                        <div className="text-gray-400">
-                          {student.class_name} - {student.stream_name}
-                        </div>
+                {filteredStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center">
+                      <div className="flex flex-col items-center justify-center text-gray-400">
+                        <FiSearch size={48} className="mb-4 opacity-50" />
+                        <p className="text-lg font-medium">No Students Found</p>
+                        <p className="text-sm mt-1">
+                          There are no students matching your search criteria.
+                        </p>
                       </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {new Date(student.test_date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {student.personality_type}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {student.primary_trait}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1">
-                        {student.career_recommendations?.map(
-                          (career: { name: string }, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 text-xs bg-orange-500 text-white rounded-full"
-                            >
-                              {career.name}
-                            </span>
-                          )
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-sm">
-                      <PDFDownloadLink
-                        document={
-                          <PsychometricReportPDF
-                            userData={{
-                              personalInfo: {
-                                fullName: student.name,
-                                testDate: new Date(
-                                  student.test_date
-                                ).toLocaleDateString(),
-                                testId: student.id,
-                              },
-                              scores: student.scores || [],
-                              personalityTraits: student.personality_type
-                                ? {
-                                    type: student.personality_type,
-                                    description: "",
-                                    traits: {
-                                      EI: {
-                                        primary: "",
-                                        secondary: "",
-                                        score: 0,
-                                        color: "",
-                                      },
-                                      SN: {
-                                        primary: "",
-                                        secondary: "",
-                                        score: 0,
-                                        color: "",
-                                      },
-                                      TF: {
-                                        primary: "",
-                                        secondary: "",
-                                        score: 0,
-                                        color: "",
-                                      },
-                                      JP: {
-                                        primary: "",
-                                        secondary: "",
-                                        score: 0,
-                                        color: "",
-                                      },
-                                      AT: {
-                                        primary: "",
-                                        secondary: "",
-                                        score: 0,
-                                        color: "",
-                                      },
-                                    },
-                                  }
-                                : undefined,
-                            }}
-                          />
-                        }
-                        fileName={`${student.name}-report.pdf`}
-                        className="inline-flex items-center px-3 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
-                      >
-                        {({ loading }) => (
-                          <>
-                            <FiDownload className="mr-2" />
-                            {loading ? "Generating..." : "Download"}
-                          </>
-                        )}
-                      </PDFDownloadLink>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  filteredStudents.map((student) => (
+                    <tr key={student.id} className="hover:bg-gray-700">
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-white">
+                          <div className="font-medium">{student.name}</div>
+                          <div className="text-gray-400">{student.email}</div>
+                          <div className="text-gray-400">
+                            {student.class_name} - {student.stream_name}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-300">
+                        {new Date(student.test_date).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-300">
+                        {student.personality_type}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-300">
+                        {student.primary_trait}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1">
+                          {student.career_recommendations?.map(
+                            (career: { name: string }, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-orange-500 text-white rounded-full"
+                              >
+                                {career.name}
+                              </span>
+                            )
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <PDFDownloadLink
+                          document={
+                            <PsychometricReportPDF
+                              userData={{
+                                personalInfo: {
+                                  fullName: student.name,
+                                  testDate: new Date(
+                                    student.test_date
+                                  ).toLocaleDateString(),
+                                  testId: student.id,
+                                },
+                                scores: student.scores || [],
+                                personalityTraits: student.personality_type
+                                  ? {
+                                      type: student.personality_type,
+                                      description: "",
+                                      traits: {
+                                        EI: {
+                                          primary: "",
+                                          secondary: "",
+                                          score: 0,
+                                          color: "",
+                                        },
+                                        SN: {
+                                          primary: "",
+                                          secondary: "",
+                                          score: 0,
+                                          color: "",
+                                        },
+                                        TF: {
+                                          primary: "",
+                                          secondary: "",
+                                          score: 0,
+                                          color: "",
+                                        },
+                                        JP: {
+                                          primary: "",
+                                          secondary: "",
+                                          score: 0,
+                                          color: "",
+                                        },
+                                        AT: {
+                                          primary: "",
+                                          secondary: "",
+                                          score: 0,
+                                          color: "",
+                                        },
+                                      },
+                                    }
+                                  : undefined,
+                              }}
+                            />
+                          }
+                          fileName={`${student.name}-report.pdf`}
+                          className="inline-flex items-center px-3 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                        >
+                          {({ loading }) => (
+                            <>
+                              <FiDownload className="mr-2" />
+                              {loading ? "Generating..." : "Download"}
+                            </>
+                          )}
+                        </PDFDownloadLink>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

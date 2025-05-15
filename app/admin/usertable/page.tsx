@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
       {/* <h1 className="text-2xl font-bold mb-4 text-white">All Users</h1> */}
       <UsersTable
         getStudents={getStudents}
-        users={students.length > 0 ? students : sampleUsers}
+        users={students?.length > 0 ? students : sampleUsers}
         nextPageUrl={nextPageUrl}
         prevPageUrl={prevPageUrl}
         totalCount={totalCount}
