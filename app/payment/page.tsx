@@ -149,6 +149,9 @@ const PaymentPage = () => {
           // On success: set subscription flag and redirect
           sessionStorage.setItem("hasSubscription", "true");
           toast.success("Payment successful");
+          await api.patch(API_URL.STUDENT.UPDATE_BASIC(student.student_uuid), {
+            is_subscribed: true,
+          });
           router.push("/user/dashboard/test/results");
         },
         prefill: {

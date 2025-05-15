@@ -40,25 +40,34 @@ interface Student {
   class_name: { name: string };
   stream_name: { name: string };
   created_at: string;
+  is_subscribed: boolean;
 }
 
 const Dashboard: NextPage = () => {
-  const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("home");
+  const [activeMenuItem, setActiveMenuItem] = useState<MenuItem>("");
   // const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [nextPageUrl, setNextPageUrl] = useState<string | null>(null);
   const [prevPageUrl, setPrevPageUrl] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [count, setCount] = useState<number>(0);
+  const [subscribedCount, setSubscribedCount] = useState<number>(0);
 
   const fetchStudents = async (url?: string) => {
     try {
       const respons = await api.get(url || API_URL.STUDENT.BASIC);
       console.log(respons.data);
-      setStudents(respons.data.results);
-      setNextPageUrl(respons.data.next);
-      setPrevPageUrl(respons.data.previous);
-      setTotalCount(respons.data.count);
+
+      const filterSubscribedStudents = respons.data.results.filter(
+        (student: Student) => student?.is_subscribed === true
+      );
+      setSubscribedCount(filterSubscribedStudents?.length);
+      setCount(respons.data?.count);
+      setStudents(respons.data?.results);
+      setNextPageUrl(respons.data?.next);
+      setPrevPageUrl(respons.data?.previous);
+      setTotalCount(respons.data?.count);
     } catch (error) {
       console.log(error);
     }
@@ -66,6 +75,9 @@ const Dashboard: NextPage = () => {
 
   useEffect(() => {
     fetchStudents();
+    if (sessionStorage.getItem("activeMenuItem")) {
+      setActiveMenuItem(sessionStorage.getItem("activeMenuItem") as MenuItem);
+    }
   }, []);
 
   // Sample student data
@@ -91,6 +103,7 @@ const Dashboard: NextPage = () => {
 
   console.log(loginData);
 
+  
   // const handleTestNavigation = () => {
   //   setActiveMenuItem("test");
   //   // router.push("/test");
@@ -98,32 +111,43 @@ const Dashboard: NextPage = () => {
 
   const handleUserNavigation = () => {
     setActiveMenuItem("user");
+    sessionStorage.setItem("activeMenuItem", "user");
     // router.push("/admin/usertable");
   };
 
   const handlequestionNavigation = () => {
     setActiveMenuItem("questions");
+    sessionStorage.setItem("activeMenuItem", "questions");
     // router.push("/admin/usertable");
   };
 
   const handlecreerNavigation = () => {
     setActiveMenuItem("creer");
+    sessionStorage.setItem("activeMenuItem", "creer");
     // router.push("/admin/usertable");
   };
 
   const handlecategoryNavigation = () => {
     setActiveMenuItem("category");
+    sessionStorage.setItem("activeMenuItem", "category");
     // router.push("/admin/usertable");
   };
 
   const handlepaymentNavigation = () => {
     setActiveMenuItem("payment");
+    sessionStorage.setItem("activeMenuItem", "payment");
     // router.push("/admin/usertable");
   };
 
   const handlereportNavigation = () => {
     setActiveMenuItem("report");
+    sessionStorage.setItem("activeMenuItem", "report");
     // router.push("/admin/usertable");
+  };
+
+  const handleHomeNavigation = () => {
+    setActiveMenuItem("home");
+    sessionStorage.setItem("activeMenuItem", "home");
   };
 
   return (
@@ -157,7 +181,7 @@ const Dashboard: NextPage = () => {
           className={`p-3 rounded-lg mb-2 ${
             activeMenuItem === "home" ? "bg-gray-800" : "hover:bg-gray-800"
           }`}
-          onClick={() => setActiveMenuItem("home")}
+          onClick={handleHomeNavigation}
         >
           <Home size={20} />
         </button>
@@ -309,17 +333,17 @@ const Dashboard: NextPage = () => {
 
               <div className="grid grid-cols-3 gap-4 mb-4">
                 <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-md p-3 text-center shadow-lg">
-                  <div className="text-xl font-semibold">{students.length}</div>
+                  <div className="text-xl font-semibold">{count}</div>
                   <div className="text-xs">Total Students</div>
                 </div>
 
                 <div className="bg-gradient-to-br from-orange-400 to-orange-500 rounded-md p-3 text-center shadow-lg">
-                  <div className="text-xl font-semibold">1,059</div>
+                  <div className="text-xl font-semibold">{subscribedCount}</div>
                   <div className="text-xs">Subscribed Students</div>
                 </div>
 
                 <div className="bg-gradient-to-br from-orange-300 to-orange-400 rounded-md p-3 text-center shadow-lg">
-                  <div className="text-xl font-semibold">{students.length}</div>
+                  <div className="text-xl font-semibold">{count}</div>
                   <div className="text-xs">No of test taken</div>
                 </div>
               </div>
@@ -410,9 +434,9 @@ const Dashboard: NextPage = () => {
                           {student.name}
                         </div>
                         <div className="flex items-center gap-1">
-                          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
-                            in progress
-                          </span>
+                          {/* <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full border border-blue-500/30">
+                            {student.created_at}
+                          </span> */}
                           <button>
                             <svg
                               width="16"
@@ -436,7 +460,7 @@ const Dashboard: NextPage = () => {
                         <div className="w-5 h-5 rounded-full bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center text-xs text-white">
                           {student.name.charAt(0)}
                         </div>
-                        <span>Logged in at {student.created_at}</span>
+                        <span>{student.Phone}</span>
                       </div>
                     </div>
                   ))}

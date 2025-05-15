@@ -3,12 +3,15 @@ import { API_URL } from '../services/api_url';
 
 // Create axios instance with custom config
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://crm.testb.pixelsoft.online',
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000, // 10 seconds
 });
+
+//https://crm.testb.pixelsoft.online/
+//http://localhost:8000
 
 // Request interceptor
 api.interceptors.request.use(

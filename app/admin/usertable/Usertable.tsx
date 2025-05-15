@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import api from "@/app/lib/axios";
 import { API_URL } from "@/app/services/api_url";
 import { toast } from "react-toastify";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { PiStudentBold } from "react-icons/pi";
+import { BiSolidReport } from "react-icons/bi";
 
 interface User {
   id: string;
@@ -146,7 +149,7 @@ export default function UsersTable({
                       </th>
                       <th
                         scope="col"
-                        className="px-6 py-4 text-right text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
+                        className="px-6 py-4 text-xs font-medium text-gray-300 uppercase tracking-wider bg-gray-700/50"
                       >
                         Actions
                       </th>
@@ -199,18 +202,18 @@ export default function UsersTable({
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex space-x-2 justify-end">
+                          <div className="flex space-x-2 justify-center">
                             <button
                               onClick={() => handleProfileClick(user.id)}
                               className="text-orange-500 hover:text-orange-400 bg-orange-500/10 px-4 py-2 rounded-lg transition-colors"
                             >
-                              View Profile
+                              <PiStudentBold size={20} />
                             </button>
                             <button
                               onClick={() => handleResultsClick(user.id)}
                               className="text-blue-500 hover:text-blue-400 bg-blue-500/10 px-4 py-2 rounded-lg transition-colors"
                             >
-                              View Results
+                              <BiSolidReport size={20} />
                             </button>
                             <button
                               onClick={() =>
@@ -221,7 +224,7 @@ export default function UsersTable({
                               }
                               className="text-red-500 hover:text-red-400 bg-red-500/10 px-4 py-2 rounded-lg transition-colors"
                             >
-                              Delete
+                              <FaRegTrashAlt size={20} />
                             </button>
                           </div>
                         </td>

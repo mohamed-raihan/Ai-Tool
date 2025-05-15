@@ -20,6 +20,7 @@ export const API_URL = {
     STUDENT: {
         BASIC: '/api/student/',
         DELETE_BASIC: (id: string) => `/api/student/${id}/`,
+        UPDATE_BASIC: (id: string) => `/api/student/${id}/`,
         EDUCATION: '/api/education/',
         PERSONAL: '/api/personal/',
     },
