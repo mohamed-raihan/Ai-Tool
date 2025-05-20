@@ -3,30 +3,36 @@ import Image from "next/image";
 import React, { useState } from "react";
 
 const gradeOptions = [
-  { label: "A+", value: 99.5 },
-  { label: "A", value: 95.5 },
-  { label: "B+", value: 88 },
-  { label: "B", value: 84.5 },
-  { label: "C+", value: 78 },
-  { label: "C", value: 74.5 },
-  { label: "D+", value: 68 },
-  { label: "D", value: 65.5 },
-  { label: "F", value: 60 },
+  { label: "A+", value: 99 },
+  { label: "A", value: 89 },
+  { label: "B+", value: 79 },
+  { label: "B", value: 69 },
+  { label: "C+", value: 59 },
+  { label: "C", value: 49 },
+  { label: "D+", value: 39 },
+  { label: "D", value: 29 },
+  { label: "E", value: 19 },
+
 ];
 
 type Subject = {
   name: string;
   grade: number;
+  marks: number;
+  totalMarks: number;
 };
 
 export default function PercentageCalculatorPage() {
+  const [calculationMode, setCalculationMode] = useState<"marks" | "grade">(
+    "grade"
+  );
   const [subjects, setSubjects] = useState<Subject[]>([
-    { name: "", grade: gradeOptions[0].value },
+    { name: "", grade: gradeOptions[0].value, marks: 0, totalMarks: 100 },
   ]);
 
   const handleSubjectChange = (
     index: number,
-    field: "name" | "grade",
+    field: "name" | "grade" | "marks" | "totalMarks",
     value: string | number
   ) => {
     setSubjects((prev) =>
@@ -37,7 +43,7 @@ export default function PercentageCalculatorPage() {
   const addSubject = () => {
     setSubjects((prev) => [
       ...prev,
-      { name: "", grade: gradeOptions[0].value },
+      { name: "", grade: gradeOptions[0].value, marks: 0, totalMarks: 100 },
     ]);
   };
 
@@ -47,16 +53,25 @@ export default function PercentageCalculatorPage() {
 
   const average =
     subjects.length > 0
-      ? (
-          subjects.reduce((sum, subj) => sum + Number(subj.grade), 0) /
-          subjects.length
-        ).toFixed(2)
+      ? calculationMode === "grade"
+        ? (
+            subjects.reduce((sum, subj) => sum + Number(subj.grade), 0) /
+            subjects.length
+          ).toFixed(2)
+        : (
+            (subjects.reduce((sum, subj) => sum + Number(subj.marks), 0) /
+              subjects.reduce(
+                (sum, subj) => sum + Number(subj.totalMarks),
+                0
+              )) *
+            100
+          ).toFixed(2)
       : "0.00";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#dbefe9] via-[#f1f5f9] to-[#0f172a] dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 flex flex-col items-center justify-start">
       {/* Header */}
-      <div className="w-full bg-[#264653] relative py-30  px-6 sm:px-10 flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="w-full bg-[#264653] relative pb-20 pt-[250px] px-6 sm:px-10 flex flex-col md:flex-row md:items-center md:justify-between">
         <div className="max-w-2xl mx-auto md:mx-0">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-2">
             Percentage Calculator
@@ -80,9 +95,30 @@ export default function PercentageCalculatorPage() {
       <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-start justify-between gap-10 md:gap-16 lg:gap-20 mt-[-60px] z-10 relative px-4 sm:px-6 lg:px-0">
         {/* Calculator Card */}
         <div className="w-full lg:w-1/2 bg-white dark:bg-[#18181b] rounded-2xl shadow-2xl p-6 sm:p-8 relative mb-20 md:mt-10">
-          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-            Semester 1
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+              Semester 1
+            </h2>
+            <div className="flex items-center gap-4">
+              <label className="text-gray-700 dark:text-gray-300">
+                Calculation Mode:
+              </label>
+              <select
+                className="bg-transparent border border-gray-300 dark:border-gray-600 rounded-md px-3 py-1 text-gray-900 dark:text-white"
+                value={calculationMode}
+                onChange={(e) =>
+                  setCalculationMode(e.target.value as "marks" | "grade")
+                }
+              >
+                <option className="bg-gray-900 dark:text-white" value="grade">
+                  Grade
+                </option>
+                <option className="bg-gray-900 dark:text-white" value="marks">
+                  Marks
+                </option>
+              </select>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-4 text-sm sm:text-base">
               <thead>
@@ -91,8 +127,13 @@ export default function PercentageCalculatorPage() {
                     Subject
                   </th>
                   <th className="py-3 px-4 font-semibold border-b border-gray-200 dark:border-gray-700">
-                    Grade
+                    {calculationMode === "grade" ? "Grade" : "Marks"}
                   </th>
+                  {calculationMode === "marks" && (
+                    <th className="py-3 px-4 font-semibold border-b border-gray-200 dark:border-gray-700">
+                      Total Marks
+                    </th>
+                  )}
                   <th className="py-3 px-4 font-semibold border-b border-gray-200 dark:border-gray-700"></th>
                 </tr>
               </thead>
@@ -114,28 +155,61 @@ export default function PercentageCalculatorPage() {
                       />
                     </td>
                     <td className="py-3 px-4">
-                      <select
-                        className="bg-transparent border-none w-full text-gray-900 dark:text-white focus:outline-none appearance-none"
-                        value={subject.grade}
-                        onChange={(e) =>
-                          handleSubjectChange(
-                            idx,
-                            "grade",
-                            Number(e.target.value)
-                          )
-                        }
-                      >
-                        {gradeOptions.map((opt) => (
-                          <option
-                            key={opt.label}
-                            value={opt.value}
-                            className="text-gray-900 dark:text-white bg-white dark:bg-[#18181b]"
-                          >
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
+                      {calculationMode === "grade" ? (
+                        <select
+                          className="bg-transparent border-none w-full text-gray-900 dark:text-white focus:outline-none appearance-none"
+                          value={subject.grade}
+                          onChange={(e) =>
+                            handleSubjectChange(
+                              idx,
+                              "grade",
+                              Number(e.target.value)
+                            )
+                          }
+                        >
+                          {gradeOptions.map((opt) => (
+                            <option
+                              key={opt.label}
+                              value={opt.value}
+                              className="text-gray-900 dark:text-white bg-white dark:bg-[#18181b]"
+                            >
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          className="bg-transparent border-none w-full text-gray-900 dark:text-white focus:outline-none"
+                          placeholder="Marks"
+                          value={subject.marks}
+                          onChange={(e) =>
+                            handleSubjectChange(
+                              idx,
+                              "marks",
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      )}
                     </td>
+                    {calculationMode === "marks" && (
+                      <td className="py-3 px-4">
+                        <input
+                          type="text"
+                          className="bg-transparent border-none w-full text-gray-900 dark:text-white focus:outline-none"
+                          placeholder="Total"
+                          value={subject.totalMarks}
+                          onChange={(e) =>
+                            handleSubjectChange(
+                              idx,
+                              "totalMarks",
+                              Number(e.target.value)
+                            )
+                          }
+                        />
+                      </td>
+                    )}
                     <td className="py-3 px-4 text-center">
                       {subjects.length > 1 && (
                         <button
